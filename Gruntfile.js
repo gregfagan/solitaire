@@ -28,13 +28,25 @@ module.exports = function(grunt) {
             }
         },
 
+        react: {
+            jsx: {
+                dest: 'build/js',
+                cwd: 'app',
+                src: [ '**/*.jsx' ],
+                ext: '.js',
+                expand: true,
+                flatten: true
+            }
+        },
+
         copy: {
             build: {
                 cwd: 'app',
                 src: [
                     '**',
                     '!**/*.styl',
-                    '!index.html'
+                    '!index.html',
+                    '!jsx/**'
                 ],
                 dest: 'build',
                 expand: true
@@ -44,7 +56,6 @@ module.exports = function(grunt) {
                 src: [ 
                     'requirejs/require.js',
                     'react/react.js',
-                    'react/JSXTransformer.js'
                 ],
                 dest: 'build/js',
                 flatten: true,
@@ -112,7 +123,7 @@ module.exports = function(grunt) {
             if (target === 'development') {
                 grunt.config.set('livereload', "<script>document.write('<script src=\"http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1\"></' + 'script>')</script>");    
             }
-            grunt.task.run([ 'clean:build', 'jshint', 'copy', 'stylus' ]);
+            grunt.task.run([ 'clean:build', 'jshint', 'react', 'copy', 'stylus' ]);
         }
      );
 
