@@ -2,18 +2,32 @@
  * @jsx React.DOM 
  */
 
+// Unicode suit characters
+// ♧♤♡♢
+
 // Card
 var Card = React.createClass({
     getInitialState: function () {
-        return { dragging: false, rel: {x:0, y:0} };
+        return {
+            dragging: false,
+            offset: {x:0, y:0},
+            pos: {x:0, y:0}
+        };
     },
 
     // calculate relative position to the mouse and set dragging=true
     onMouseDown: function (e) {
-        this.setState({ dragging: true, rel:{
-            x: e.pageX - this.props.active.position.x,
-            y: e.pageY - this.props.active.position.y,
-        } });
+        this.setState({
+            dragging: true,
+            offset:{
+                x: e.pageX,
+                y: e.pageY,
+            },
+            pos: {
+                x: 0,
+                y: 0
+            }
+        });
 
         e.stopPropagation();
         e.preventDefault();
@@ -28,23 +42,25 @@ var Card = React.createClass({
     onMouseMove: function (e) {
         if (!this.state.dragging) return
 
-        this.props.onDrag(
-            e.pageX - this.state.rel.x,
-            e.pageY - this.state.rel.y
-        );
+        this.setState({
+            pos: {
+                x: e.pageX - this.state.offset.x,
+                y: e.pageY - this.state.offset.y
+            }
+        });
 
-        e.stopPropagation()
-        e.preventDefault()
+        e.stopPropagation();
+        e.preventDefault();
     },
 
     render: function() {
         var classes = "card";
         var style = {};
-        if (this.props.active) {
+        if (this.state.dragging) {
             classes += " active";
             style['-webkit-transform'] =
-                'translateX(' + this.props.active.position.x + 'px) ' +
-                'translateY(' + this.props.active.position.y + 'px)';
+                'translateX(' + this.state.pos.x + 'px) ' +
+                'translateY(' + this.state.pos.y + 'px)';
         }
 
         return (
@@ -52,7 +68,7 @@ var Card = React.createClass({
                 onMouseDown={this.onMouseDown}
                 onMouseMove={this.onMouseMove}
                 onMouseUp={this.onMouseUp}>
-                <h1>{this.props.value}</h1>
+                <h1>{this.props.id}</h1>
             </div>
         );
     }
@@ -61,31 +77,27 @@ var Card = React.createClass({
 var Board = React.createClass({
     getInitialState: function () {
         return({
-            activeCard: {
-                position: {
-                    x: 0,
-                    y: 0
-                }
-            }
-        });
-    },
-
-    onDrag: function (x, y) {
-        this.setState({
-            activeCard: {
-                position: {
-                    x: x,
-                    y: y
-                }
-            }
+            cards: [
+                "A♧",
+                "2♤"
+            ]
         });
     },
 
     render: function() {
+        var that = this;
+        var cards = this.state.cards.map(function (card) {
+            return (
+                <Card
+                    key={card}
+                    id={card}
+                />
+                );
+        });
+
         return (
             <div className="board">
-                <Card value="A" active={this.state.activeCard} onDrag={this.onDrag} />
-                <Card value="2"/>
+                {cards}
             </div>    
         );
     }

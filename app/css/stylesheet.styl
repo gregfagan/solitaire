@@ -1,0 +1,58 @@
+// <Boilerplate>
+@import 'nib'
+
+global-reset()
+
+// Adapted from http://www.paulirish.com/2012/box-sizing-border-box-ftw/
+*, *:before, *:after
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+// </Boilerplate>
+
+p-text-color = #454545
+p-light-text-color = #999
+
+background-navy = #0F2A42
+
+accent-orange = #F58156
+accent-blue = #2D82CC
+accent-pink = #E359A6
+accent-green = #3AB050
+accent-yellow = #EFC554
+
+@font-face
+    font-family 'Cambo'
+    font-style normal
+    font-weight 400
+    src local('Cambo'), local('Cambo-Regular'), url(http://themes.googleusercontent.com/static/fonts/cambo/v3/svHugj7NIrTQRq-kuQ9YEKCWcynf_cDxXwCLxiixG1c.woff) format('woff')
+
+body
+    background-color background-navy
+    font-family 'Cambo', serif
+    color p-text-color
+    font-size 16px
+    line-height 1.8em
+
+h1
+    font-size 1.8em
+    line-height 1.3em
+
+h2
+    font-size 1.6em
+    line-height 1.1em
+    color p-light-text-color
+
+.card
+    cursor pointer
+    width 5em
+    height 7.5em
+    background-color accent-orange
+    color white
+    margin 1em
+    padding 0.5em
+    //transition transform 0.5s, box-shadow 0.5s
+
+.active
+    transform scale(1.1)
+    box-shadow 0.35em 0.35em black
