@@ -55,7 +55,8 @@ module.exports = function(grunt) {
                 cwd: 'bower_components',
                 src: [ 
                     'requirejs/require.js',
-                    'react/react.js',
+                    'react/react-with-addons.js',
+                    'underscore/underscore.js'
                 ],
                 dest: 'build/js',
                 flatten: true,

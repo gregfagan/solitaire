@@ -2,8 +2,19 @@
  * @jsx React.DOM 
  */
 
-// Unicode suit characters
-// ♧♤♡♢
+function createDeck() {
+    var suits = ['♧', '♤', '♡', '♢'];
+    var values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+    var deck = [];
+
+    suits.forEach(function (suit) {
+        values.forEach(function (value) {
+            deck.push(value + suit);
+        })
+    })
+
+    return deck;
+}
 
 // Card
 var Card = React.createClass({
@@ -11,7 +22,7 @@ var Card = React.createClass({
         return {
             dragging: false,
             offset: {x:0, y:0},
-            pos: {x:0, y:0}
+            position: {x:0, y:0}
         };
     },
 
@@ -23,7 +34,7 @@ var Card = React.createClass({
                 x: e.pageX,
                 y: e.pageY,
             },
-            pos: {
+            position: {
                 x: 0,
                 y: 0
             }
@@ -43,7 +54,7 @@ var Card = React.createClass({
         if (!this.state.dragging) return
 
         this.setState({
-            pos: {
+            position: {
                 x: e.pageX - this.state.offset.x,
                 y: e.pageY - this.state.offset.y
             }
@@ -54,21 +65,32 @@ var Card = React.createClass({
     },
 
     render: function() {
-        var classes = "card";
-        var style = {};
-        if (this.state.dragging) {
-            classes += " active";
-            style['-webkit-transform'] =
-                'translateX(' + this.state.pos.x + 'px) ' +
-                'translateY(' + this.state.pos.y + 'px)';
-        }
+        // var classes = "card";
+        // var style = {};
+        // if (this.state.dragging) {
+        //     classes += " active";
+        //     style['-webkit-transform'] +=
+        //         'translateX(' + this.state.position.x + 'px) ' +
+        //         'translateY(' + this.state.position.y + 'px)';
+        // }
+        // className={classes} style={style}
+        var cx = React.addons.classSet;
+        var classes = cx({
+            'card': true,
+            'flipped': this.props.flipped
+        });
 
+                // onMouseDown={this.onMouseDown}
+                // onMouseMove={this.onMouseMove}
+                // onMouseUp={this.onMouseUp}
+
+        // Chrome will not show the back face of the card without a character
+        // being rendered. I used '_' here, but it is the same color as the
+        // background, so it doesn't appear to display.
         return (
-            <div className={classes} style={style}
-                onMouseDown={this.onMouseDown}
-                onMouseMove={this.onMouseMove}
-                onMouseUp={this.onMouseUp}>
-                <h1>{this.props.id}</h1>
+            <div className={classes}>
+                <figure className="front">{this.props.id}</figure>
+                <figure className="back">_</figure>
             </div>
         );
     }
@@ -76,29 +98,34 @@ var Card = React.createClass({
 
 var Board = React.createClass({
     getInitialState: function () {
-        return({
-            cards: [
-                "A♧",
-                "2♤"
-            ]
+        return {
+            deck: [].concat(_.first(_.shuffle(createDeck()))),
+            flipped: false
+        };
+    },
+
+    onMouseDown: function (e) {
+        this.setState({
+            flipped: !this.state.flipped
         });
     },
 
     render: function() {
         var that = this;
-        var cards = this.state.cards.map(function (card) {
+        var cards = this.state.deck.map(function (card) {
             return (
                 <Card
                     key={card}
                     id={card}
+                    flipped={that.state.flipped}
                 />
                 );
         });
 
         return (
-            <div className="board">
+            <section className="board" onMouseDown={this.onMouseDown}>
                 {cards}
-            </div>    
+            </section>    
         );
     }
 });
