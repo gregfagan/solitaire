@@ -123,14 +123,14 @@ var Board = React.createClass({
         });
 
         return (
-            <section className="board" onMouseDown={this.onMouseDown}>
+            <div className="board" onMouseDown={this.onMouseDown}>
                 {cards}
-            </section>    
+            </div>
         );
     }
 });
 
 React.renderComponent(
     <Board />,
-    document.getElementById('example')
+    document.getElementById('screen')
 );

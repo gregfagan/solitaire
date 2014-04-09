@@ -1,13 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <title>Solitaire</title>
+
+    <meta charset="utf-8">
+    <!-- Mobile devices use the whole screen and do not zoom -->
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
     <link href="/css/stylesheet.css" rel="stylesheet" media="screen">
+
     <script src="js/react-with-addons.js"></script>
     <script src="js/underscore.js"></script>
   </head>
   <body>
-    <div id="example"></div>
+    <div id="screen"></div>
+    
     <script src="js/main.js"></script>
+
+    <!-- For development, auto-reload the page. -->
     <%= livereload %>
   </body>
 </html>
