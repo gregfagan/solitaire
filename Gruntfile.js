@@ -6,6 +6,10 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON('package.json'),
 
         clean: {
+            tmp: {
+                src: [ 'tmp' ]
+            },
+
             build: {
                 src: [ 'build' ]
             },
@@ -30,7 +34,7 @@ module.exports = function(grunt) {
 
         react: {
             jsx: {
-                dest: 'build/js',
+                dest: 'tmp/js',
                 cwd: 'app',
                 src: [ '**/*.jsx' ],
                 ext: '.js',
@@ -48,7 +52,7 @@ module.exports = function(grunt) {
                     '!index.html',
                     '!jsx/**'
                 ],
-                dest: 'build',
+                dest: 'tmp',
                 expand: true
             },
             bower: {
@@ -58,18 +62,24 @@ module.exports = function(grunt) {
                     'react/react-with-addons.js',
                     'underscore/underscore.js'
                 ],
-                dest: 'build/js',
+                dest: 'tmp/js',
                 flatten: true,
                 expand: true
             },
             index: {
                 src: 'app/index.html',
-                dest: 'build/index.html',
+                dest: 'tmp/index.html',
                 options: {
                     process: function(content, srcpath) {
                         return grunt.template.process(content);
                     }
                 }
+            },
+            tmp: {
+                cwd: 'tmp',
+                src: '**',
+                dest: 'build',
+                expand: true
             }
         },
 
@@ -77,7 +87,7 @@ module.exports = function(grunt) {
             build: {
                 cwd: 'app',
                 src: '**/*.styl',
-                dest:'build',
+                dest:'tmp',
                 expand: true,
                 ext: '.css'
             }
@@ -88,7 +98,7 @@ module.exports = function(grunt) {
                 options: {
                     baseUrl: 'app/js',
                     name: 'main',
-                    out: 'build/js/main.js'
+                    out: 'tmp/js/main.js'
                 }
             },
         },
@@ -124,7 +134,7 @@ module.exports = function(grunt) {
             if (target === 'development') {
                 grunt.config.set('livereload', "<script>document.write('<script src=\"http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1\"></' + 'script>')</script>");    
             }
-            grunt.task.run([ 'clean:build', 'jshint', 'react', 'copy', 'stylus' ]);
+            grunt.task.run([ 'jshint', 'react', 'copy:build', 'copy:bower', 'copy:index', 'stylus', 'clean:build', 'copy:tmp', 'clean:tmp' ]);
         }
      );
 
