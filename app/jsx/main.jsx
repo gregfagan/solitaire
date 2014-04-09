@@ -74,8 +74,7 @@ var Card = React.createClass({
         //         'translateY(' + this.state.position.y + 'px)';
         // }
         // className={classes} style={style}
-        var cx = React.addons.classSet;
-        var classes = cx({
+        var classes = React.addons.classSet({
             'card': true,
             'flipped': this.props.flipped
         });
@@ -96,35 +95,84 @@ var Card = React.createClass({
     }
 });
 
+var Stack = React.createClass({
+    render: function() {
+        var first = _.first(this.props.cards);
+        var rest = this.props.cards.slice(1);
+
+        var stack = (
+            <div>
+                <div className="stack">
+                    <Card
+                        key={first}
+                        id={first}
+                        flipped={this.props.flipped}
+                    />
+                </div>
+                <Stack cards={rest} flipped={this.props.flipped} />
+            </div>
+        );
+
+        return (
+            <div>
+                {first && stack}
+            </div>
+        );
+    }
+});
+
+var Column = React.createClass({
+    render: function () {
+        return (
+            <div className="column">
+                <Stack cards={this.props.covered} flipped={true} />
+                <Stack cards={this.props.uncovered} />
+            </div>
+        );
+    }
+});
+
+var Tableau = React.createClass({
+    render: function () {
+        var columns = this.props.columns.map(function (column, index) {
+            return (
+                <Column key={index} covered={column.covered} uncovered={column.uncovered} />
+            );
+        });
+        return (
+            <div className="tableau">
+                {columns}
+            </div>
+        );
+    }
+});
+
 var Board = React.createClass({
     getInitialState: function () {
+        var deck = _.shuffle(createDeck());
+
+        var i,j;
+        var column;
+        var tableau = [];
+        for (i = 0; i < 7; i++) {
+            column = { covered: [], uncovered: [] };
+            for (j = 0; j < i; j++) {
+                column.covered.push(deck.shift());
+            }
+            column.uncovered.push(deck.shift());
+            tableau.push(column);
+        }
+
         return {
-            deck: _.shuffle(createDeck()),
-            flipped: false
+            draw: deck,
+            tableau: tableau
         };
     },
 
-    onMouseDown: function (e) {
-        this.setState({
-            flipped: !this.state.flipped
-        });
-    },
-
     render: function() {
-        var that = this;
-        var cards = this.state.deck.map(function (card) {
-            return (
-                <Card
-                    key={card}
-                    id={card}
-                    flipped={that.state.flipped}
-                />
-                );
-        });
-
         return (
-            <div className="board" onMouseDown={this.onMouseDown}>
-                {cards}
+            <div className="board">
+                <Tableau columns={this.state.tableau} />
             </div>
         );
     }

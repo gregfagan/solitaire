@@ -39,16 +39,24 @@ body
     position fixed
 
 .board
+    font-size 36px
     position absolute
-    margin 1em
+    margin 0.25em
+
+.column
+    float left
+    margin-right 0.25em
+
+.stack
+    position relative
+    margin-bottom -3em
 
 .card
-    font-size 36px
     user-select none
     cursor pointer
     width 2.5em
     height 3.5em
-    position absolute
+    position relative
     transform-style preserve-3d
     
     figure
@@ -63,6 +71,7 @@ body
         margin 0
         backface-visibility hidden
         border-radius 0.25em
+        box-shadow 0 0 0.25em black
     .front
         background-color white
     .back
