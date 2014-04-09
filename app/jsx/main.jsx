@@ -69,7 +69,7 @@ var Card = React.createClass({
         // var style = {};
         // if (this.state.dragging) {
         //     classes += " active";
-        //     style['-webkit-transform'] +=
+        //     style['-webkit-transform'] =
         //         'translateX(' + this.state.position.x + 'px) ' +
         //         'translateY(' + this.state.position.y + 'px)';
         // }
@@ -80,9 +80,9 @@ var Card = React.createClass({
             'flipped': this.props.flipped
         });
 
-                // onMouseDown={this.onMouseDown}
-                // onMouseMove={this.onMouseMove}
-                // onMouseUp={this.onMouseUp}
+        // onMouseDown={this.onMouseDown}
+        // onMouseMove={this.onMouseMove}
+        // onMouseUp={this.onMouseUp}
 
         // Chrome will not show the back face of the card without a character
         // being rendered. I used '_' here, but it is the same color as the
@@ -99,7 +99,7 @@ var Card = React.createClass({
 var Board = React.createClass({
     getInitialState: function () {
         return {
-            deck: [].concat(_.first(_.shuffle(createDeck()))),
+            deck: _.shuffle(createDeck()),
             flipped: false
         };
     },
