@@ -160,6 +160,19 @@ var WastePile = React.createClass({
     }
 });
 
+var Foundation = React.createClass({
+    render: function () {
+        return (
+            <div id="foundation">
+                <Card slot={true}/>
+                <Card slot={true}/>
+                <Card slot={true}/>
+                <Card slot={true}/>
+            </div>
+        );
+    }
+});
+
 var Board = React.createClass({
     getInitialState: function () {
         var deck = _.shuffle(createDeck());
@@ -188,6 +201,7 @@ var Board = React.createClass({
             <div id="board">
                 <DrawPile cards={this.state.draw} drawCard={this.drawCard} />
                 <WastePile cards={this.state.waste} />
+                <Foundation />
                 <Tableau columns={this.state.tableau} />
             </div>
         );
