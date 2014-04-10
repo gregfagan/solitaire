@@ -101,7 +101,7 @@ var Card = React.createClass({
 var Stack = React.createClass({
     render: function() {
         var first = _.first(this.props.cards);
-        var rest = this.props.cards.slice(1);
+        var rest = _.rest(this.props.cards);
 
         return (
             <div className="stack">
@@ -208,15 +208,19 @@ var Board = React.createClass({
     },
 
     drawCard: function() {
-        // TODO: reset to draw pile when empty
-
-        var first = _.first(this.state.draw);
-        var rest = this.state.draw.slice(1);
-
-        this.setState({
-            draw: rest,
-            waste: [].concat(first, this.state.waste)
-        })
+        // empty?
+        if (this.state.draw.length <= 0) {
+            this.setState({
+                draw: this.state.waste.slice(0).reverse(),
+                waste: []
+            });
+        }
+        else {
+            this.setState(React.addons.update(this.state, {
+                draw: { $set: _.rest(this.state.draw) },
+                waste: { $unshift: [ _.first(this.state.draw) ] }
+            }));
+        }
     }
 });
 
