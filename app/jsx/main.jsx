@@ -16,8 +16,7 @@ function createDeck() {
     return deck;
 }
 
-// Card
-var Card = React.createClass({
+var Draggable = {
     getInitialState: function () {
         return {
             dragging: false,
@@ -62,27 +61,30 @@ var Card = React.createClass({
 
         e.stopPropagation();
         e.preventDefault();
-    },
+    }
 
+
+    // onMouseDown={this.onMouseDown}
+    // onMouseMove={this.onMouseMove}
+    // onMouseUp={this.onMouseUp}
+
+    // var style = {};
+    // if (this.state.dragging) {
+    //     classes += " active";
+    //     style['-webkit-transform'] =
+    //         'translateX(' + this.state.position.x + 'px) ' +
+    //         'translateY(' + this.state.position.y + 'px)';
+    // }
+};
+
+// Card
+var Card = React.createClass({
     render: function() {
-        // var classes = "card";
-        // var style = {};
-        // if (this.state.dragging) {
-        //     classes += " active";
-        //     style['-webkit-transform'] =
-        //         'translateX(' + this.state.position.x + 'px) ' +
-        //         'translateY(' + this.state.position.y + 'px)';
-        // }
-        // className={classes} style={style}
         var classes = React.addons.classSet({
             'card': true,
             'flipped': this.props.flipped,
             'coverBottom': this.props.coverBottom
         });
-
-        // onMouseDown={this.onMouseDown}
-        // onMouseMove={this.onMouseMove}
-        // onMouseUp={this.onMouseUp}
 
         // Chrome will not show the back face of the card without a character
         // being rendered. I used '_' here, but it is the same color as the
