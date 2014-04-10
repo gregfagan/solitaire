@@ -129,8 +129,44 @@ var Tableau = React.createClass({
             );
         });
         return (
-            <div className="tableau">
+            <div id="tableau">
                 {columns}
+            </div>
+        );
+    }
+});
+
+var DrawPile = React.createClass({
+    render: function() {
+        var card;
+        if (this.props.cards.length > 0) {
+            card = (
+                <Card flipped={true}/>
+            );
+        }
+        else {
+            // TODO: move to Card
+            card = (
+                <div className="card">
+                    <figure className="empty"></figure>
+                </div>
+            );
+        }
+
+        return (
+            <div id="drawPile" onClick={this.props.drawCard}>
+                { card }
+            </div>
+        );
+    }
+});
+
+var WastePile = React.createClass({
+    render: function () {
+        var first = _.first(this.props.cards);
+        return (
+            <div id="wastePile">
+                { first && <Card key={first} id={first} /> }
             </div>
         );
     }
@@ -154,16 +190,31 @@ var Board = React.createClass({
 
         return {
             draw: deck,
+            waste: [],
             tableau: tableau
         };
     },
 
     render: function() {
         return (
-            <div className="board">
+            <div id="board">
+                <DrawPile cards={this.state.draw} drawCard={this.drawCard} />
+                <WastePile cards={this.state.waste} />
                 <Tableau columns={this.state.tableau} />
             </div>
         );
+    },
+
+    drawCard: function() {
+        // TODO: reset to draw pile when empty
+
+        var first = _.first(this.state.draw);
+        var rest = this.state.draw.slice(1);
+
+        this.setState({
+            draw: rest,
+            waste: [].concat(first, this.state.waste)
+        })
     }
 });
 

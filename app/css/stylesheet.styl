@@ -38,10 +38,19 @@ body
     height 100%
     position fixed
 
-.board
+#board
     font-size 36px
     position absolute
     margin 0.25em
+
+#drawPile
+#wastePile
+    margin-bottom 1em
+    margin-right 0.25em
+    float left
+
+#tableau
+    clear both
 
 .column
     float left
@@ -80,6 +89,9 @@ body
         background-color accent-orange
         border 0.2em solid white
         transform rotateY(180deg)
+    .empty
+        background none
+        border 0.1em dashed p-light-text-color
 
 .flipped
     transform rotateY(180deg)
