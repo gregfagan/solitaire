@@ -91,7 +91,7 @@ var Card = React.createClass({
         // background, so it doesn't appear to display.
         return (
             <div className={classes}>
-                <figure className="front">{this.props.id}</figure>
+                <figure className={this.props.slot ? "slot" : "front"}>{this.props.id}</figure>
                 <figure className="back">_</figure>
             </div>
         );
@@ -140,24 +140,10 @@ var Tableau = React.createClass({
 
 var DrawPile = React.createClass({
     render: function() {
-        var card;
-        if (this.props.cards.length > 0) {
-            card = (
-                <Card flipped={true}/>
-            );
-        }
-        else {
-            // TODO: move to Card
-            card = (
-                <div className="card">
-                    <figure className="empty"></figure>
-                </div>
-            );
-        }
-
+        var empty = this.props.cards.length <= 0;
         return (
             <div id="drawPile" onClick={this.props.drawCard}>
-                { card }
+                <Card flipped={!empty} slot={empty}/>
             </div>
         );
     }
