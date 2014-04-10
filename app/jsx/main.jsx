@@ -76,7 +76,8 @@ var Card = React.createClass({
         // className={classes} style={style}
         var classes = React.addons.classSet({
             'card': true,
-            'flipped': this.props.flipped
+            'flipped': this.props.flipped,
+            'coverBottom': this.props.coverBottom
         });
 
         // onMouseDown={this.onMouseDown}
@@ -100,22 +101,10 @@ var Stack = React.createClass({
         var first = _.first(this.props.cards);
         var rest = this.props.cards.slice(1);
 
-        var stack = (
-            <div>
-                <div className="stack">
-                    <Card
-                        key={first}
-                        id={first}
-                        flipped={this.props.flipped}
-                    />
-                </div>
-                <Stack cards={rest} flipped={this.props.flipped} />
-            </div>
-        );
-
         return (
-            <div>
-                {first && stack}
+            <div className="stack">
+                { first && <Card key={first} id={first} flipped={this.props.flipped} coverBottom={true}/> }
+                { rest.length > 0 && <Stack cards={rest} flipped={this.props.flipped} /> }
             </div>
         );
     }
