@@ -9,14 +9,22 @@ function createDeck() {
 
     suits.forEach(function (suit) {
         values.forEach(function (value) {
-            deck.push(value + suit);
+            deck.push({value: value, suit: suit});
         })
     })
 
     return deck;
 }
 
-var Draggable = {
+function isRed(card) {
+    return card.suit === '♡' || card.suit === '♢';
+}
+
+function isBlack(card) {
+    return !isRed(card);
+}
+
+var Draggable = React.createClass({
     getInitialState: function () {
         return {
             dragging: false,
@@ -61,21 +69,32 @@ var Draggable = {
 
         e.stopPropagation();
         e.preventDefault();
+    },
+
+    render: function () {
+        var transform
+        if (this.state.dragging) {
+            transform = {
+                // TODO: use all vendor specific transform styles
+                WebkitTransform: 
+                    'translateX(' + this.state.position.x + 'px) ' +
+                    'translateY(' + this.state.position.y + 'px)' +
+                    'translateZ(15px)'
+            };
+        }
+
+        return (
+            <div
+                style={transform}
+                onMouseDown={this.onMouseDown}
+                onMouseMove={this.onMouseMove}
+                onMouseUp={this.onMouseUp}
+            >
+                {this.props.children}
+            </div>
+        );
     }
-
-
-    // onMouseDown={this.onMouseDown}
-    // onMouseMove={this.onMouseMove}
-    // onMouseUp={this.onMouseUp}
-
-    // var style = {};
-    // if (this.state.dragging) {
-    //     classes += " active";
-    //     style['-webkit-transform'] =
-    //         'translateX(' + this.state.position.x + 'px) ' +
-    //         'translateY(' + this.state.position.y + 'px)';
-    // }
-};
+});
 
 // Card
 var Card = React.createClass({
@@ -86,12 +105,22 @@ var Card = React.createClass({
             'coverBottom': this.props.coverBottom
         });
 
+        // TODO: cleaner. make 'red' and 'black' css classes to use stylesheet
+        // defined colors.
+        var front =  {
+            className: this.props.slot ? "slot" : "front",
+            text: this.props.card ? this.props.card.value + this.props.card.suit : "",
+            style: this.props.card ? {
+                color: isRed(this.props.card) ? "red" : "black"
+            } : null
+        }
+
         // Chrome will not show the back face of the card without a character
         // being rendered. I used '_' here, but it is the same color as the
         // background, so it doesn't appear to display.
         return (
             <div className={classes}>
-                <figure className={this.props.slot ? "slot" : "front"}>{this.props.id}</figure>
+                <figure className={front.className} style={front.style}>{front.text}</figure>
                 <figure className="back">_</figure>
             </div>
         );
@@ -105,7 +134,7 @@ var Stack = React.createClass({
 
         return (
             <div className="stack">
-                { first && <Card key={first} id={first} flipped={this.props.flipped} coverBottom={true}/> }
+                { first && <Card card={first} flipped={this.props.flipped} coverBottom={true}/> }
                 { rest.length > 0 && <Stack cards={rest} flipped={this.props.flipped} /> }
             </div>
         );
@@ -154,7 +183,7 @@ var WastePile = React.createClass({
         var first = _.first(this.props.cards);
         return (
             <div id="wastePile">
-                { first && <Card key={first} id={first} /> }
+                { first && <Draggable><Card card={first} /></Draggable> }
             </div>
         );
     }
