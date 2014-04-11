@@ -32,7 +32,7 @@ function deal(deck) {
     }
 
     return {
-        deck: deck,
+        draw: deck,
         waste: [],
         foundation: [ [], [], [], [] ],
         tableau: tableau,
@@ -138,6 +138,9 @@ var Card = React.createClass({
             } : null
         }
 
+        // Chrome will not show the back face of the card without a character
+        // being rendered. I used '_' here, but it is the same color as the
+        // background, so it doesn't appear to display.
         return (
             <div className={classes}>
                 <figure
@@ -146,10 +149,6 @@ var Card = React.createClass({
                 >
                     {face.text}
                 </figure>
-                
-                // Chrome will not show the back face of the card without a character
-                // being rendered. I used '_' here, but it is the same color as the
-                // background, so it doesn't appear to display.
                 <figure className="back">_</figure>
             </div>
         );
