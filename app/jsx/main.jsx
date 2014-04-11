@@ -16,6 +16,29 @@ function createDeck() {
     return deck;
 }
 
+function deal(deck) {
+    deck = deck.slice(0);
+
+    var i,j;
+    var column;
+    var tableau = [];
+    for (i = 0; i < 7; i++) {
+        column = { covered: [], uncovered: [] };
+        for (j = 0; j < i; j++) {
+            column.covered.push(deck.shift());
+        }
+        column.uncovered.push(deck.shift());
+        tableau.push(column);
+    }
+
+    return {
+        deck: deck,
+        waste: [],
+        foundation: [ [], [], [], [] ],
+        tableau: tableau,
+    }
+}
+
 function isRed(card) {
     return card.suit === '♡' || card.suit === '♢';
 }
@@ -115,9 +138,6 @@ var Card = React.createClass({
             } : null
         }
 
-        // Chrome will not show the back face of the card without a character
-        // being rendered. I used '_' here, but it is the same color as the
-        // background, so it doesn't appear to display.
         return (
             <div className={classes}>
                 <figure
@@ -126,6 +146,10 @@ var Card = React.createClass({
                 >
                     {face.text}
                 </figure>
+                
+                // Chrome will not show the back face of the card without a character
+                // being rendered. I used '_' here, but it is the same color as the
+                // background, so it doesn't appear to display.
                 <figure className="back">_</figure>
             </div>
         );
@@ -209,25 +233,7 @@ var Foundation = React.createClass({
 
 var Board = React.createClass({
     getInitialState: function () {
-        var deck = _.shuffle(createDeck());
-
-        var i,j;
-        var column;
-        var tableau = [];
-        for (i = 0; i < 7; i++) {
-            column = { covered: [], uncovered: [] };
-            for (j = 0; j < i; j++) {
-                column.covered.push(deck.shift());
-            }
-            column.uncovered.push(deck.shift());
-            tableau.push(column);
-        }
-
-        return {
-            draw: deck,
-            waste: [],
-            tableau: tableau
-        };
+        return deal(_.shuffle(createDeck()));
     },
 
     render: function() {
