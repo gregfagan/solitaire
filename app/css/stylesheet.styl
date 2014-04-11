@@ -33,6 +33,8 @@ body
     color p-text-color
     height 100%
 
+// transform-style is not inherited by children. To maintain z space throughtout
+// all elements on screen, give each the preserve-3d style.
 #screen
 #board
 #drawPile
@@ -100,7 +102,7 @@ body
         margin 0
         backface-visibility hidden
         border-radius 0.25em
-    .front
+    .face
         background-color white
     .back
         color accent-orange

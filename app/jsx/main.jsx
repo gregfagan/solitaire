@@ -107,8 +107,8 @@ var Card = React.createClass({
 
         // TODO: cleaner. make 'red' and 'black' css classes to use stylesheet
         // defined colors.
-        var front =  {
-            className: this.props.slot ? "slot" : "front",
+        var face =  {
+            className: this.props.slot ? "slot" : "face",
             text: this.props.card ? this.props.card.value + this.props.card.suit : "",
             style: this.props.card ? {
                 color: isRed(this.props.card) ? "red" : "black"
@@ -120,7 +120,12 @@ var Card = React.createClass({
         // background, so it doesn't appear to display.
         return (
             <div className={classes}>
-                <figure className={front.className} style={front.style}>{front.text}</figure>
+                <figure
+                    className={face.className}
+                    style={face.style}
+                >
+                    {face.text}
+                </figure>
                 <figure className="back">_</figure>
             </div>
         );
