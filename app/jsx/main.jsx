@@ -95,7 +95,7 @@ var Draggable = React.createClass({
     },
 
     render: function () {
-        var transform
+        var transform = {};
         if (this.state.dragging) {
             transform = {
                 // TODO: use all vendor specific transform styles
