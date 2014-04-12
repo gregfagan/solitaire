@@ -51,88 +51,6 @@ function isBlack(card) {
     return !isRed(card);
 }
 
-// Adapted from Jared Forsyth's code:
-// http://stackoverflow.com/questions/20926551/recommended-way-of-making-react-component-div-draggable
-var Draggable = React.createClass({
-    getInitialState: function () {
-        return {
-            dragging: false,
-            offset: {x:0, y:0},
-            position: {x:0, y:0}
-        };
-    },
-
-    // calculate relative position to the mouse and set dragging=true
-    onMouseDown: function (e) {
-        this.setState({
-            dragging: true,
-            offset:{
-                x: e.pageX,
-                y: e.pageY,
-            },
-            position: {
-                x: 0,
-                y: 0
-            }
-        });
-
-        e.stopPropagation();
-        e.preventDefault();
-    },
-
-    onMouseUp: function (e) {
-        this.setState({ dragging: false });
-        e.stopPropagation();
-        e.preventDefault();
-    },
-
-    onMouseMove: function (e) {
-        if (!this.state.dragging) return
-
-        this.setState({
-            position: {
-                x: e.pageX - this.state.offset.x,
-                y: e.pageY - this.state.offset.y
-            }
-        });
-
-        e.stopPropagation();
-        e.preventDefault();
-    },
-
-    componentDidUpdate: function (props, state) {
-        if (this.state.dragging && !state.dragging) {
-            document.addEventListener('mousemove', this.onMouseMove)
-            document.addEventListener('mouseup', this.onMouseUp)
-        } else if (!this.state.dragging && state.dragging) {
-            document.removeEventListener('mousemove', this.onMouseMove)
-            document.removeEventListener('mouseup', this.onMouseUp)
-        }
-    },
-
-    render: function () {
-        var transform = {};
-        if (this.state.dragging) {
-            transform = {
-                // TODO: use all vendor specific transform styles
-                WebkitTransform: 
-                    'translateX(' + this.state.position.x + 'px) ' +
-                    'translateY(' + this.state.position.y + 'px)' +
-                    'translateZ(15px)'
-            };
-        }
-
-        return (
-            <div
-                style={transform}
-                onMouseDown={this.onMouseDown}
-            >
-                {this.props.children}
-            </div>
-        );
-    }
-});
-
 var Card = React.createClass({
     getDefaultProps: function() {
         return {
@@ -144,8 +62,9 @@ var Card = React.createClass({
     onMouseDown: function(e) {
         if (this.props.events.grab) {
             var node = this.getDOMNode();
-            var where = { x: node.offsetLeft, y: node.offsetTop };
-            this.props.events.grab(this.props.card, where);
+            var location = { x: node.offsetLeft, y: node.offsetTop };
+            var drag = { x: e.pageX, y: e.pageY }
+            this.props.events.grab(this.props.card, location, drag);
             e.preventDefault();
             e.stopPropagation();
         }
@@ -346,17 +265,40 @@ var Board = React.createClass({
 
     // DOM events
     componentDidMount: function() {
-        // document.addEventListener('mousemove', this.onMouseMove)
+        document.addEventListener('mousemove', this.onMouseMove);
         document.addEventListener('mouseup', this.onMouseUp);
     },
 
     componentWillUnmount: function() {
         document.removeEventListener('mouseup', this.onMouseUp);
+        document.removeEventListener('mousemove', this.onMouseMove);
     },
 
     onMouseUp: function(e) {
         if(this.state.hand.cards.length > 0)
             this.dropCard();
+    },
+
+    onMouseMove: function(e) {
+        if(this.state.hand.cards.length > 0) {
+            var newDrag = { x: e.pageX, y: e.pageY };
+            var delta = {
+                x: newDrag.x - this.state.drag.x,
+                y: newDrag.y - this.state.drag.y
+            };
+            var previousPosition = this.state.hand.position;
+            var newPosition = {
+                x: previousPosition.x + delta.x,
+                y: previousPosition.y + delta.y
+            };
+
+            this.setState(React.addons.update(this.state, {
+                hand: {
+                    position: {$set: newPosition}
+                },
+                drag: {$set: newDrag}
+            }));
+        }
     },
 
     // state transformations
@@ -376,7 +318,7 @@ var Board = React.createClass({
         }
     },
 
-    grabCard: function(card, location) {
+    grabCard: function(card, location, dragStart) {
         // Find the card
         if (_.first(this.state.waste) === card) {
             this.setState({
@@ -385,7 +327,8 @@ var Board = React.createClass({
                     cards: [ card ],
                     position: location
                 },
-                previous: this.state
+                previous: this.state,
+                drag: dragStart
             });
         }
         // TODO: look elsewhere :)
