@@ -3,7 +3,7 @@
  */
 
 function createDeck() {
-    var suits = ['♧', '♤', '♡', '♢'];
+    var suits = ['♣', '♠', '♥', '♦'];
     var values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
     var deck = [];
 
@@ -44,18 +44,27 @@ function deal(deck) {
 }
 
 function isRed(card) {
-    return card.suit === '♡' || card.suit === '♢';
+    return card.suit === '♥' || card.suit === '♦';
 }
 
-function isBlack(card) {
-    return !isRed(card);
-}
+var Face = React.createClass({
+    render: function() {
+        var symbol = this.props.card.value + this.props.card.suit;
+        var rotate = { WebkitTransform: "rotateZ(180deg)" };
+        return (
+            <div className={"side face " + (isRed(this.props.card) ? "red" : "black")}>
+                <figure className="side corner">{symbol}</figure>
+                <figure className="side corner" style={rotate}>{symbol}</figure>
+                <figure className="side center">{this.props.card.suit}</figure>
+            </div>
+        );
+    }
+});
 
 var Card = React.createClass({
     getDefaultProps: function() {
         return {
-            events: {},
-            card: {value:"", suit:""}
+            events: {}
         }
     },
 
@@ -64,7 +73,7 @@ var Card = React.createClass({
             var node = this.getDOMNode();
             var location = { x: node.offsetLeft, y: node.offsetTop };
             var drag = { x: e.pageX, y: e.pageY }
-            this.props.events.grab(this.props.card, location, drag);
+            this.props.events.grab(this.props.face, location, drag);
             e.preventDefault();
             e.stopPropagation();
         }
@@ -72,7 +81,7 @@ var Card = React.createClass({
 
     onMouseUp: function(e) {
         if (this.props.events.drop) {
-            this.props.events.drop(this.props.card);
+            this.props.events.drop(this.props.face);
             e.preventDefault();
             e.stopPropagation();
         }
@@ -85,30 +94,23 @@ var Card = React.createClass({
             'coverBottom': this.props.coverBottom
         });
 
-        // TODO: cleaner. make 'red' and 'black' css classes to use stylesheet
-        // defined colors.
-        var face =  {
-            className: this.props.slot ? "slot" : "face",
-            text: this.props.card.value + this.props.card.suit,
-            style: {
-                color: isRed(this.props.card) ? "red" : "black"
-            }
+        var front = this.props.face ?
+            <Face card={this.props.face} /> :
+            <div className="side slot"></div>;
+
+        var back;
+        if (this.props.face) {
+            back = <div className="side back"/>;
         }
 
-        // Chrome will not show the back face of the card without a character
-        // being rendered. I used '_' here, but it is the same color as the
-        // background, so it doesn't appear to display.
         return (
-            <div className={classes}>
-                <figure
-                    className={face.className}
-                    style={face.style}
-                    onMouseDown={this.onMouseDown}
-                    onMouseUp={this.onMouseUp}
-                >
-                    {face.text}
-                </figure>
-                <figure className="back">_</figure>
+            <div
+                className={classes}
+                onMouseDown={this.onMouseDown}
+                onMouseUp={this.onMouseUp}
+            >
+                { front }
+                { back }
             </div>
         );
     }
@@ -121,7 +123,7 @@ var Stack = React.createClass({
 
         if (last) {
             last = <Card
-                card={last}
+                face={last}
                 flipped={this.props.flipped}
                 coverBottom={true}
                 events={this.props.events}
@@ -182,7 +184,7 @@ var DrawPile = React.createClass({
         var empty = this.props.cards.length <= 0;
         return (
             <div id="drawPile" onClick={this.props.events.draw}>
-                <Card flipped={!empty} slot={empty}/>
+                <Card face={_.last(this.props.cards)} flipped={!empty}/>
             </div>
         );
     }
@@ -193,7 +195,7 @@ var WastePile = React.createClass({
         var first = _.first(this.props.cards);
 
         if (first) {
-            first = <Card card={first} events={this.props.events} />;
+            first = <Card face={first} events={this.props.events} />;
         }
 
         return (

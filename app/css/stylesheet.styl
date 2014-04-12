@@ -20,16 +20,16 @@ accent-blue = #2D82CC
 accent-pink = #E359A6
 accent-green = #3AB050
 accent-yellow = #EFC554
+accent-red = #FF4C57
 
 @font-face
-    font-family 'Cambo'
-    font-style normal
-    font-weight 400
-    src local('Cambo'), local('Cambo-Regular'), url(http://themes.googleusercontent.com/static/fonts/cambo/v3/svHugj7NIrTQRq-kuQ9YEKCWcynf_cDxXwCLxiixG1c.woff) format('woff')
+    font-family 'Exo'
+    font-weight 900
+    src local('Exo'), url(http://fonts.googleapis.com/css?family=Exo:400,900&subset=latin,latin-ext)
 
 body
     background-color background-navy
-    font-family 'Cambo', serif
+    font-family 'Exo', sans-serif
     color p-text-color
     height 100%
 
@@ -88,7 +88,7 @@ body
     position relative
 
 .coverBottom
-    margin-bottom -3em
+    margin-bottom -2.9em
 
 .card
     outline 1px solid transparent
@@ -98,27 +98,36 @@ body
     height 3.5em
     position relative
     transform-style preserve-3d
-    figure
-        text-align center
-        font-weight bold
+    .side
         position absolute
         display block
         width 100%
         height 100%
-        padding 0.25em
-        margin 0
         backface-visibility hidden
         border-radius 0.25em
     .face
         background-color white
+        font-weight bold
+        .center
+            line-height 2.95em
+            text-align center
+        .corner
+            font-size 0.5em
+            text-align left
+        figure
+            margin 0
+            padding 0.2em
     .back
-        color accent-orange
         background-color accent-orange
-        border 0.2em solid white
+        border 0.18em solid white
         transform rotateY(180deg)
     .slot
         background none
         border 0.1em dashed p-light-text-color
+    .red
+        color darken(accent-red, 7%)
+    .black
+        color darken(p-text-color, 8%)
 
 .flipped
     transform rotateY(180deg)
