@@ -134,10 +134,29 @@ var Draggable = React.createClass({
 });
 
 var Card = React.createClass({
+    getDefaultProps: function() {
+        return {
+            events: {},
+            card: {value:"", suit:""}
+        }
+    },
+
     onMouseDown: function(e) {
-        var node = this.getDOMNode();
-        var where = { x: node.offsetLeft, y: node.offsetTop };
-        Board.events.broadcast('grabCard', this.props.card, where)();
+        if (this.props.events.grab) {
+            var node = this.getDOMNode();
+            var where = { x: node.offsetLeft, y: node.offsetTop };
+            this.props.events.grab(this.props.card, where);
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    },
+
+    onMouseUp: function(e) {
+        if (this.props.events.drop) {
+            this.props.events.drop(this.props.card);
+            e.preventDefault();
+            e.stopPropagation();
+        }
     },
 
     render: function() {
@@ -151,10 +170,10 @@ var Card = React.createClass({
         // defined colors.
         var face =  {
             className: this.props.slot ? "slot" : "face",
-            text: this.props.card ? this.props.card.value + this.props.card.suit : "",
-            style: this.props.card ? {
+            text: this.props.card.value + this.props.card.suit,
+            style: {
                 color: isRed(this.props.card) ? "red" : "black"
-            } : null
+            }
         }
 
         // Chrome will not show the back face of the card without a character
@@ -166,7 +185,7 @@ var Card = React.createClass({
                     className={face.className}
                     style={face.style}
                     onMouseDown={this.onMouseDown}
-                    onMouseUp={Board.events.broadcast('dropCard', this.props.card)}
+                    onMouseUp={this.onMouseUp}
                 >
                     {face.text}
                 </figure>
@@ -181,10 +200,27 @@ var Stack = React.createClass({
         var last = _.last(this.props.cards);
         var initial = _.initial(this.props.cards);
 
+        if (last) {
+            last = <Card
+                card={last}
+                flipped={this.props.flipped}
+                coverBottom={true}
+                events={this.props.events}
+            />;
+        }
+
+        if (initial.length > 0) {
+            initial = <Stack
+                cards={initial}
+                flipped={this.props.flipped}
+                events={this.props.events}
+            />;
+        }
+
         return (
             <div className="stack">
-                { last && <Card card={last} flipped={this.props.flipped} coverBottom={true}/> }
-                { initial.length > 0 && <Stack cards={initial} flipped={this.props.flipped} /> }
+                { last }
+                { initial }
             </div>
         );
     }
@@ -194,8 +230,8 @@ var Column = React.createClass({
     render: function () {
         return (
             <div className="column">
-                <Stack cards={this.props.covered} flipped={true} />
-                <Stack cards={this.props.uncovered} />
+                <Stack cards={this.props.covered}   flipped={true} />
+                <Stack cards={this.props.uncovered} events={this.props.events} />
             </div>
         );
     }
@@ -203,9 +239,15 @@ var Column = React.createClass({
 
 var Tableau = React.createClass({
     render: function () {
+        var that = this;
         var columns = this.props.columns.map(function (column, index) {
             return (
-                <Column key={index} covered={column.covered} uncovered={column.uncovered} />
+                <Column
+                    key={index}
+                    covered={column.covered}
+                    uncovered={column.uncovered}
+                    events={that.props.events}
+                />
             );
         });
         return (
@@ -220,7 +262,7 @@ var DrawPile = React.createClass({
     render: function() {
         var empty = this.props.cards.length <= 0;
         return (
-            <div id="drawPile" onClick={this.props.drawCard}>
+            <div id="drawPile" onClick={this.props.events.draw}>
                 <Card flipped={!empty} slot={empty}/>
             </div>
         );
@@ -230,9 +272,14 @@ var DrawPile = React.createClass({
 var WastePile = React.createClass({
     render: function () {
         var first = _.first(this.props.cards);
+
+        if (first) {
+            first = <Card card={first} events={this.props.events} />;
+        }
+
         return (
             <div id="wastePile">
-                { first && <Card card={first} /> }
+                { first }
             </div>
         );
     }
@@ -271,47 +318,45 @@ var Hand = React.createClass({
 });
 
 var Board = React.createClass({
-    // TODO: don't do this. instead, build a game events object with the valid
-    // event callback object for the state of the game (either grab or drop
-    // depending on hand) and pass that to children.
-    //
-    // Children can inspect the object to see if they should take action on DOM
-    // events.
-    statics: {
-        events: function () {
-            var that = this;
-            return {
-                subscribe: function(o) {
-                    that.handler = o;
-                },
-                broadcast: function(e /*, ... */) {
-                    var args = _.rest(_.toArray(arguments));
-                    return function() {
-                        that.handler[e].apply(that.handler, args);    
-                    }
-                }
-            }
-        }()
-    },
-
     getInitialState: function () {
         return deal(_.shuffle(createDeck()));
     },
 
     render: function() {
+        var events = {
+            draw: this.drawCard
+        };
+        if (this.state.hand.cards.length > 0) {
+            events.drop = this.dropCard;
+        }
+        else {
+            events.grab = this.grabCard;
+        }
+
         return (
             <div id="board">
-                <DrawPile cards={this.state.draw} drawCard={this.drawCard} />
-                <WastePile cards={this.state.waste} />
+                <DrawPile cards={this.state.draw} events={events} />
+                <WastePile cards={this.state.waste} events={events} />
                 <Foundation />
-                <Tableau columns={this.state.tableau} />
-                <Hand hand={this.state.hand}/>
+                <Tableau columns={this.state.tableau} events={events} />
+                <Hand hand={this.state.hand} />
             </div>
         );
     },
 
+    // DOM events
     componentDidMount: function() {
-        Board.events.subscribe(this);
+        // document.addEventListener('mousemove', this.onMouseMove)
+        document.addEventListener('mouseup', this.onMouseUp);
+    },
+
+    componentWillUnmount: function() {
+        document.removeEventListener('mouseup', this.onMouseUp);
+    },
+
+    onMouseUp: function(e) {
+        if(this.state.hand.cards.length > 0)
+            this.dropCard();
     },
 
     // state transformations
