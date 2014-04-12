@@ -36,6 +36,10 @@ function deal(deck) {
         waste: [],
         foundation: [ [], [], [], [] ],
         tableau: tableau,
+        hand: {
+            cards: [],
+            position: { x: 0, y: 0 }
+        }
     }
 }
 
@@ -47,6 +51,8 @@ function isBlack(card) {
     return !isRed(card);
 }
 
+// Adapted from Jared Forsyth's code:
+// http://stackoverflow.com/questions/20926551/recommended-way-of-making-react-component-div-draggable
 var Draggable = React.createClass({
     getInitialState: function () {
         return {
@@ -94,6 +100,16 @@ var Draggable = React.createClass({
         e.preventDefault();
     },
 
+    componentDidUpdate: function (props, state) {
+        if (this.state.dragging && !state.dragging) {
+            document.addEventListener('mousemove', this.onMouseMove)
+            document.addEventListener('mouseup', this.onMouseUp)
+        } else if (!this.state.dragging && state.dragging) {
+            document.removeEventListener('mousemove', this.onMouseMove)
+            document.removeEventListener('mouseup', this.onMouseUp)
+        }
+    },
+
     render: function () {
         var transform = {};
         if (this.state.dragging) {
@@ -110,8 +126,6 @@ var Draggable = React.createClass({
             <div
                 style={transform}
                 onMouseDown={this.onMouseDown}
-                onMouseMove={this.onMouseMove}
-                onMouseUp={this.onMouseUp}
             >
                 {this.props.children}
             </div>
@@ -119,8 +133,13 @@ var Draggable = React.createClass({
     }
 });
 
-// Card
 var Card = React.createClass({
+    onMouseDown: function(e) {
+        var node = this.getDOMNode();
+        var where = { x: node.offsetLeft, y: node.offsetTop };
+        Board.events.broadcast('grabCard', this.props.card, where)();
+    },
+
     render: function() {
         var classes = React.addons.classSet({
             'card': true,
@@ -146,6 +165,8 @@ var Card = React.createClass({
                 <figure
                     className={face.className}
                     style={face.style}
+                    onMouseDown={this.onMouseDown}
+                    onMouseUp={Board.events.broadcast('dropCard', this.props.card)}
                 >
                     {face.text}
                 </figure>
@@ -157,13 +178,13 @@ var Card = React.createClass({
 
 var Stack = React.createClass({
     render: function() {
-        var first = _.first(this.props.cards);
-        var rest = _.rest(this.props.cards);
+        var last = _.last(this.props.cards);
+        var initial = _.initial(this.props.cards);
 
         return (
             <div className="stack">
-                { first && <Card card={first} flipped={this.props.flipped} coverBottom={true}/> }
-                { rest.length > 0 && <Stack cards={rest} flipped={this.props.flipped} /> }
+                { last && <Card card={last} flipped={this.props.flipped} coverBottom={true}/> }
+                { initial.length > 0 && <Stack cards={initial} flipped={this.props.flipped} /> }
             </div>
         );
     }
@@ -211,7 +232,7 @@ var WastePile = React.createClass({
         var first = _.first(this.props.cards);
         return (
             <div id="wastePile">
-                { first && <Draggable><Card card={first} /></Draggable> }
+                { first && <Card card={first} /> }
             </div>
         );
     }
@@ -230,7 +251,49 @@ var Foundation = React.createClass({
     }
 });
 
+var Hand = React.createClass({
+    render: function() {
+        var position = this.props.hand.position || { x: 0, y: 0 };
+        transform = {
+            // TODO: use all vendor specific transform styles
+            WebkitTransform: 
+                'translateX(' + position.x + 'px) ' +
+                'translateY(' + position.y + 'px)' +
+                'translateZ(15px)'
+        };
+
+        return (
+            <div id="hand" style={transform}>
+                <Stack cards={this.props.hand.cards} />
+            </div>
+        );
+    }
+});
+
 var Board = React.createClass({
+    // TODO: don't do this. instead, build a game events object with the valid
+    // event callback object for the state of the game (either grab or drop
+    // depending on hand) and pass that to children.
+    //
+    // Children can inspect the object to see if they should take action on DOM
+    // events.
+    statics: {
+        events: function () {
+            var that = this;
+            return {
+                subscribe: function(o) {
+                    that.handler = o;
+                },
+                broadcast: function(e /*, ... */) {
+                    var args = _.rest(_.toArray(arguments));
+                    return function() {
+                        that.handler[e].apply(that.handler, args);    
+                    }
+                }
+            }
+        }()
+    },
+
     getInitialState: function () {
         return deal(_.shuffle(createDeck()));
     },
@@ -242,10 +305,16 @@ var Board = React.createClass({
                 <WastePile cards={this.state.waste} />
                 <Foundation />
                 <Tableau columns={this.state.tableau} />
+                <Hand hand={this.state.hand}/>
             </div>
         );
     },
 
+    componentDidMount: function() {
+        Board.events.subscribe(this);
+    },
+
+    // state transformations
     drawCard: function() {
         // empty?
         if (this.state.draw.length <= 0) {
@@ -259,6 +328,47 @@ var Board = React.createClass({
                 draw: { $set: _.rest(this.state.draw) },
                 waste: { $unshift: [ _.first(this.state.draw) ] }
             }));
+        }
+    },
+
+    grabCard: function(card, location) {
+        // Find the card
+        if (_.first(this.state.waste) === card) {
+            this.setState({
+                waste: _.rest(this.state.waste),
+                hand: {
+                    cards: [ card ],
+                    position: location
+                },
+                previous: this.state
+            });
+        }
+        // TODO: look elsewhere :)
+    },
+
+    dropCard: function(target) {
+        // Can the target receive the hand?
+        var that = this;
+        var successful = false;
+        this.state.tableau.forEach(function(column, i) {
+            if (_.first(column.uncovered) === target) {
+                var newColumn = React.addons.update(column, {
+                    uncovered: {$unshift: that.state.hand.cards}
+                })
+
+                that.setState(React.addons.update(that.state, {
+                    hand: { cards: {$set: []} },
+                    tableau: {$splice: [[i, 1, newColumn]]},
+                    previous: {$set: null}
+                }));
+
+                successful = true;
+            }
+        });
+
+        // Invalid target, drop hand by restoring previous state.
+        if (!successful) {
+            this.replaceState(this.state.previous);
         }
     }
 });
