@@ -43,13 +43,69 @@ function deal(deck) {
     }
 }
 
+function pathFromCard(card, container, path) {
+    path = path || [];
+
+    var currentPath;
+    var child;
+    var result;
+
+    for (k in container) {
+        currentPath = path.concat(k);
+        if (container.hasOwnProperty(k)) {
+            child = container[k];
+            if (isCard(child)) {
+                if (toId(child) === toId(card)) {
+                    return currentPath;
+                }
+            }
+            else {
+                var result = pathFromCard(card, child, currentPath);
+                if (result) {
+                    return result;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+function get_in(container, path) {
+    if (path.length === 0)
+        return container;
+
+    return get_in(container[_.first(path)], _.rest(path));
+}
+
+function build_op(container, path, op) {
+    var result = {};
+    var key = _.first(path);
+    if (path.length === 1) {
+        result[key] = op;   
+    }
+    else {
+        result[key] = build_op(container[key], _.rest(path), op);
+    }
+
+    return result;
+}
+
+function isCard(card) {
+    return card.suit && card.value;
+}
+
 function isRed(card) {
     return card.suit === '♥' || card.suit === '♦';
 }
 
+function toId(card) {
+    return card.value + card.suit;
+}
+
 var Face = React.createClass({
     render: function() {
-        var symbol = this.props.card.value + this.props.card.suit;
+        var symbol = toId(this.props.card);
         var rotate = { WebkitTransform: "rotateZ(180deg)" };
         return (
             <div className={"side face " + (isRed(this.props.card) ? "red" : "black")}>
@@ -118,21 +174,21 @@ var Card = React.createClass({
 
 var Stack = React.createClass({
     render: function() {
-        var last = _.last(this.props.cards);
-        var initial = _.initial(this.props.cards);
+        var first = _.first(this.props.cards);
+        var rest = _.rest(this.props.cards);
 
-        if (last) {
-            last = <Card
-                face={last}
+        if (first) {
+            first = <Card
+                face={first}
                 flipped={this.props.flipped}
                 coverBottom={true}
                 events={this.props.events}
             />;
         }
 
-        if (initial.length > 0) {
-            initial = <Stack
-                cards={initial}
+        if (rest.length > 0) {
+            rest = <Stack
+                cards={rest}
                 flipped={this.props.flipped}
                 events={this.props.events}
             />;
@@ -140,8 +196,8 @@ var Stack = React.createClass({
 
         return (
             <div className="stack">
-                { last }
-                { initial }
+                { rest }
+                { first }
             </div>
         );
     }
@@ -303,6 +359,17 @@ var Board = React.createClass({
         }
     },
 
+    // `from` and `to` are lists of keys that define a path inside the game state
+    moveCardOp: function(from, to) {
+        var count = _.last(from) + 1;
+        var cards = get_in(this.state, _.initial(from)).slice(0, count);
+
+        var cut = build_op(this.state, _.initial(from), {$splice: [[0, count]]});
+        var paste = build_op(this.state, to, {$unshift: cards});
+
+        return _.extend(cut, paste);
+    },
+
     // state transformations
     drawCard: function() {
         // empty?
@@ -321,19 +388,17 @@ var Board = React.createClass({
     },
 
     grabCard: function(card, location, dragStart) {
-        // Find the card
-        if (_.first(this.state.waste) === card) {
-            this.setState({
-                waste: _.rest(this.state.waste),
-                hand: {
-                    cards: [ card ],
-                    position: location
-                },
-                previous: this.state,
-                drag: dragStart
-            });
-        }
-        // TODO: look elsewhere :)
+        // TODO: bind op better (don't assume hand?)
+        // TODO: location busted from tableau?
+        var moveOp = this.moveCardOp(pathFromCard(card, this.state), ["hand", "cards"]);
+        var op = _.extend(moveOp, {
+            hand: _.extend(moveOp.hand, {
+                position: {$set: location}
+            }),
+            previous: {$set: this.state},
+            drag: {$set: dragStart}
+        });
+        this.setState(React.addons.update(this.state, op));
     },
 
     dropCard: function(target) {
@@ -342,13 +407,13 @@ var Board = React.createClass({
         var successful = false;
         this.state.tableau.forEach(function(column, i) {
             if (_.first(column.uncovered) === target) {
-                var newColumn = React.addons.update(column, {
-                    uncovered: {$unshift: that.state.hand.cards}
-                })
+                var colUpdate = { uncovered: {$unshift: that.state.hand.cards}};
+                var tabUpdate = {};
+                tabUpdate[i] = colUpdate;
 
                 that.setState(React.addons.update(that.state, {
                     hand: { cards: {$set: []} },
-                    tableau: {$splice: [[i, 1, newColumn]]},
+                    tableau: tabUpdate,
                     previous: {$set: null}
                 }));
 
