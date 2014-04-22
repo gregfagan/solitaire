@@ -49,7 +49,6 @@ module.exports = function(grunt) {
                 src: [
                     '**',
                     '!**/*.styl',
-                    '!index.html',
                     '!jsx/**'
                 ],
                 dest: 'tmp',
@@ -65,15 +64,6 @@ module.exports = function(grunt) {
                 dest: 'tmp/js',
                 flatten: true,
                 expand: true
-            },
-            index: {
-                src: 'app/index.html',
-                dest: 'tmp/index.html',
-                options: {
-                    process: function(content, srcpath) {
-                        return grunt.template.process(content);
-                    }
-                }
             },
             tmp: {
                 cwd: 'tmp',
@@ -103,7 +93,6 @@ module.exports = function(grunt) {
             },
         },
 
-        aws: grunt.file.readJSON('aws.json'),
         s3: {
             options: {
                 accessKeyId: '<%= aws.key %>',
@@ -115,14 +104,38 @@ module.exports = function(grunt) {
             deploy: {
                 cwd: 'build',
                 src: '**',
-                dest: 'react-solitaire'
+                dest: '<%= pkg.name %>'
+            }
+        },
+
+        connect: {
+            server: {
+                options: {
+                    port: 8080,
+                    base: 'build',
+                    livereload: true,
+                    useAvailablePort: true,
+                    keepalive: true
+                }
             }
         },
 
         watch: {
             development: {
                 files: [ 'app/**' ],
-                tasks: [ 'default' ]
+                tasks: [ 'build' ],
+                options: {
+                    livereload: true
+                }
+            }
+        },
+
+        concurrent: {
+            development: {
+                tasks: ['connect', 'watch'],
+                options: {
+                    logConcurrentOutput: true
+                }
             }
         }
     });
@@ -131,10 +144,16 @@ module.exports = function(grunt) {
         'build',
         'Compiles all files to human readable and browser renderable.',
          function(target) {
-            if (target === 'development') {
-                grunt.config.set('livereload', "<script>document.write('<script src=\"http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1\"></' + 'script>')</script>");    
-            }
-            grunt.task.run([ 'jshint', 'react', 'copy:build', 'copy:bower', 'copy:index', 'stylus', 'clean:build', 'copy:tmp', 'clean:tmp' ]);
+            grunt.task.run([
+                'jshint',
+                'react',
+                'copy:build',
+                'copy:bower',
+                'stylus',
+                'clean:build',
+                'copy:tmp',
+                'clean:tmp'
+            ]);
         }
      );
 
@@ -153,11 +172,15 @@ module.exports = function(grunt) {
     grunt.registerTask(
         'deploy',
         'Clean build and deploy to S3.',
-        ['release', 's3']
+        function() {
+            grunt.config.set('aws', grunt.file.readJSON('aws.json'));
+            grunt.task.run(['release', 's3']);
+        }
     );
 
     grunt.registerTask('default', [
-        'build:development'
+        'build',
+        'concurrent'
     ]);
 
     require('load-grunt-tasks')(grunt);
