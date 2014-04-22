@@ -182,16 +182,14 @@ var Stack = React.createClass({
                 face={first}
                 flipped={this.props.flipped}
                 coverBottom={true}
-                events={this.props.events}
-            />;
+                events={this.props.events} />;
         }
 
         if (rest.length > 0) {
             rest = <Stack
                 cards={rest}
                 flipped={this.props.flipped}
-                events={this.props.events}
-            />;
+                events={this.props.events} />;
         }
 
         return (
@@ -223,8 +221,7 @@ var Tableau = React.createClass({
                     key={index}
                     covered={column.covered}
                     uncovered={column.uncovered}
-                    events={that.props.events}
-                />
+                    events={that.props.events} />
             );
         });
         return (
@@ -281,7 +278,7 @@ var Hand = React.createClass({
         transform = {
             // TODO: use all vendor specific transform styles
             WebkitTransform: 
-                'translateX(' + position.x + 'px) ' +
+                'translateX(' + position.x + 'px)' +
                 'translateY(' + position.y + 'px)' +
                 'translateZ(15px)'
         };
