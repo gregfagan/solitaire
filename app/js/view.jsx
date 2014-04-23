@@ -7,6 +7,7 @@ define([
     "react-with-addons",
     "game"
     ], function define_view (_, React, game) {
+
     var Face = React.createClass({
         render: function() {
             var symbol = game.toId(this.props.card);
@@ -202,7 +203,9 @@ define([
 
         render: function() {
             var events = {
-                draw: this.drawCard
+                draw: function() {
+                    this.setState(game.drawCard(this.state));
+                }.bind(this)
             };
             if (this.state.hand.cards.length > 0) {
                 events.drop = this.dropCard;
@@ -262,34 +265,7 @@ define([
         //     }
         // },
 
-        // // `from` and `to` are lists of keys that define a path inside the game state
-        // moveCardOp: function(from, to) {
-        //     var count = _.last(from) + 1;
-        //     var cards = get_in(this.state, _.initial(from)).slice(0, count);
-
-        //     var cut = build_op(this.state, _.initial(from), {$splice: [[0, count]]});
-        //     var paste = build_op(this.state, to, {$unshift: cards});
-
-        //     return _.extend(cut, paste);
-        // },
-
         // // state transformations
-        // drawCard: function() {
-        //     // empty?
-        //     if (this.state.draw.length <= 0) {
-        //         this.setState({
-        //             draw: this.state.waste.slice(0).reverse(),
-        //             waste: []
-        //         });
-        //     }
-        //     else {
-        //         this.setState(React.addons.update(this.state, {
-        //             draw: { $set: _.rest(this.state.draw) },
-        //             waste: { $unshift: [ _.first(this.state.draw) ] }
-        //         }));
-        //     }
-        // },
-
         // grabCard: function(card, location, dragStart) {
         //     // TODO: bind op better (don't assume hand?)
         //     // TODO: location busted from tableau?

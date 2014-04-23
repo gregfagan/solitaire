@@ -1,4 +1,4 @@
-define(["underscore"], function define_game (_){
+define(["underscore", "update"], function define_game (_, update){
     function createDeck() {
         var suits = ['♣', '♠', '♥', '♦'];
         var values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
@@ -104,8 +104,41 @@ define(["underscore"], function define_game (_){
         return card.value + card.suit;
     }
 
+    function moveCard(board, from, to) {
+        if (!_.isNumber(_.last(from)))
+            from.push("0");
+
+        var count = _.last(from) + 1;
+        var cards = get_in(board, _.initial(from)).slice(0, count);
+
+        var cut = build_op(board, _.initial(from), {$splice: [[0, count]]});
+        var paste = build_op(board, to, {$unshift: cards});
+
+        var full_op = _.extend(cut, paste);
+
+        return update(board, full_op);
+    }
+
+    function recycleWaste(board) {
+        return update(board, {
+            draw: {$set: board.waste.slice(0).reverse()},
+            waste: {$set: []}
+        });
+    }
+    
+    function drawCard(board) {
+        if (board.draw.length > 0)
+            return moveCard(board, ["draw"], ["waste"]);
+        else
+            return recycleWaste(board);
+    }
+
     return {
+        // Game events
         createBoard: createBoard,
+        drawCard: drawCard,
+
+        // Card utilities
         toId: toId,
         isRed: isRed
     };
