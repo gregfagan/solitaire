@@ -1,3 +1,3 @@
-require(["game", "view"], function(game, view) {
-    view(game.createGame(), "screen");
+require(["view"], function(view) {
+    view("screen");
 });

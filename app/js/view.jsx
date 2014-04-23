@@ -196,11 +196,15 @@ define([
     });
 
     var Board = React.createClass({
+        getInitialState: function() {
+            return game.createBoard();
+        },
+
         render: function() {
             var events = {
                 draw: this.drawCard
             };
-            if (this.props.hand.cards.length > 0) {
+            if (this.state.hand.cards.length > 0) {
                 events.drop = this.dropCard;
             }
             else {
@@ -209,11 +213,11 @@ define([
 
             return (
                 <div id="board">
-                    <DrawPile cards={this.props.draw} events={events} />
-                    <WastePile cards={this.props.waste} events={events} />
+                    <DrawPile cards={this.state.draw} events={events} />
+                    <WastePile cards={this.state.waste} events={events} />
                     <Foundation />
-                    <Tableau columns={this.props.tableau} events={events} />
-                    <Hand hand={this.props.hand} />
+                    <Tableau columns={this.state.tableau} events={events} />
+                    <Hand hand={this.state.hand} />
                 </div>
             );
         },
@@ -327,9 +331,9 @@ define([
         // }
     });
 
-    return function view (game, containerId) {
+    return function view (containerId) {
         React.renderComponent(
-            Board(game),
+            Board(),
             document.getElementById(containerId)
         );
     }

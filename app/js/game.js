@@ -40,7 +40,7 @@ define(["underscore"], function define_game (_){
         };
     }
 
-    function createGame() {
+    function createBoard() {
         return deal(_.shuffle(createDeck()));
     }
 
@@ -105,7 +105,7 @@ define(["underscore"], function define_game (_){
     }
 
     return {
-        createGame: createGame,
+        createBoard: createBoard,
         toId: toId,
         isRed: isRed
     };
