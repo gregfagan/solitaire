@@ -1,17 +1,8 @@
-define(["underscore", "update"], function define_game (_, update){
-    function createDeck() {
-        var suits = ['♣', '♠', '♥', '♦'];
-        var values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-        var deck = [];
-
-        suits.forEach(function (suit) {
-            values.forEach(function (value) {
-                deck.push({value: value, suit: suit});
-            });
-        });
-
-        return deck;
-    }
+define([
+    "underscore",
+    "update",
+    "card"
+    ], function define_game (_, update, Card){
 
     function deal(deck) {
         deck = deck.slice(0);
@@ -41,7 +32,7 @@ define(["underscore", "update"], function define_game (_, update){
     }
 
     function createBoard() {
-        return deal(_.shuffle(createDeck()));
+        return deal(_.shuffle(Card.createDeck()));
     }
 
     function pathFromCard(card, container, path) {
@@ -55,8 +46,8 @@ define(["underscore", "update"], function define_game (_, update){
             currentPath = path.concat(k);
             if (container.hasOwnProperty(k)) {
                 child = container[k];
-                if (isCard(child)) {
-                    if (toId(child) === toId(card)) {
+                if (Card.isCard(child)) {
+                    if (toId(child) === Card.toId(card)) {
                         return currentPath;
                     }
                 }
@@ -72,36 +63,24 @@ define(["underscore", "update"], function define_game (_, update){
         return false;
     }
 
-    function get_in(container, path) {
+    function getIn(container, path) {
         if (path.length === 0)
             return container;
 
-        return get_in(container[_.first(path)], _.rest(path));
+        return getIn(container[_.first(path)], _.rest(path));
     }
 
-    function build_op(container, path, op) {
+    function buildOp(container, path, op) {
         var result = {};
         var key = _.first(path);
         if (path.length === 1) {
             result[key] = op;   
         }
         else {
-            result[key] = build_op(container[key], _.rest(path), op);
+            result[key] = buildOp(container[key], _.rest(path), op);
         }
 
         return result;
-    }
-
-    function isCard(card) {
-        return card.suit && card.value;
-    }
-
-    function isRed(card) {
-        return card.suit === '♥' || card.suit === '♦';
-    }
-
-    function toId(card) {
-        return card.value + card.suit;
     }
 
     function moveCard(board, from, to) {
@@ -109,14 +88,14 @@ define(["underscore", "update"], function define_game (_, update){
             from.push("0");
 
         var count = _.last(from) + 1;
-        var cards = get_in(board, _.initial(from)).slice(0, count);
+        var cards = getIn(board, _.initial(from)).slice(0, count);
 
-        var cut = build_op(board, _.initial(from), {$splice: [[0, count]]});
-        var paste = build_op(board, to, {$unshift: cards});
+        var cut = buildOp(board, _.initial(from), {$splice: [[0, count]]});
+        var paste = buildOp(board, to, {$unshift: cards});
 
-        var full_op = _.extend(cut, paste);
+        var fullOp = _.extend(cut, paste);
 
-        return update(board, full_op);
+        return update(board, fullOp);
     }
 
     function recycleWaste(board) {
@@ -134,12 +113,8 @@ define(["underscore", "update"], function define_game (_, update){
     }
 
     return {
-        // Game events
         createBoard: createBoard,
         drawCard: drawCard,
-
-        // Card utilities
-        toId: toId,
-        isRed: isRed
+        moveCard: moveCard
     };
 });

@@ -5,24 +5,25 @@
 define([
     "underscore",
     "react-with-addons",
-    "game"
-    ], function define_view (_, React, game) {
+    "game",
+    "card"
+    ], function define_view (_, React, Game, Card) {
 
-    var Face = React.createClass({
+    var FaceView = React.createClass({
         render: function() {
-            var symbol = game.toId(this.props.card);
+            var symbol = Card.toId(this.props.card);
             var rotate = { WebkitTransform: "rotateZ(180deg)" };
             return (
-                <div className={"side face " + (game.isRed(this.props.card) ? "red" : "black")}>
+                <div className={"side face " + (Card.isRed(this.props.card) ? "red" : "black")}>
                     <figure className="side corner">{symbol}</figure>
                     <figure className="side corner" style={rotate}>{symbol}</figure>
-                    <figure className="side center">{this.props.card.suit}</figure>
+                    <figure className="side center">{Card.suit(this.props.card)}</figure>
                 </div>
             );
         }
     });
 
-    var Card = React.createClass({
+    var CardView = React.createClass({
         getDefaultProps: function() {
             return {
                 events: {}
@@ -56,7 +57,7 @@ define([
             });
 
             var front = this.props.face ?
-                <Face card={this.props.face} /> :
+                <FaceView card={this.props.face} /> :
                 <div className="side slot"></div>;
 
             var back;
@@ -77,13 +78,13 @@ define([
         }
     });
 
-    var Stack = React.createClass({
+    var StackView = React.createClass({
         render: function() {
             var first = _.first(this.props.cards);
             var rest = _.rest(this.props.cards);
 
             if (first) {
-                first = <Card
+                first = <CardView
                     face={first}
                     flipped={this.props.flipped}
                     coverBottom={true}
@@ -91,7 +92,7 @@ define([
             }
 
             if (rest.length > 0) {
-                rest = <Stack
+                rest = <StackView
                     cards={rest}
                     flipped={this.props.flipped}
                     events={this.props.events} />;
@@ -106,23 +107,23 @@ define([
         }
     });
 
-    var Column = React.createClass({
+    var ColumnView = React.createClass({
         render: function () {
             return (
                 <div className="column">
-                    <Stack cards={this.props.covered}   flipped={true} />
-                    <Stack cards={this.props.uncovered} events={this.props.events} />
+                    <StackView cards={this.props.covered}   flipped={true} />
+                    <StackView cards={this.props.uncovered} events={this.props.events} />
                 </div>
             );
         }
     });
 
-    var Tableau = React.createClass({
+    var TableauView = React.createClass({
         render: function () {
             var that = this;
             var columns = this.props.columns.map(function (column, index) {
                 return (
-                    <Column
+                    <ColumnView
                         key={index}
                         covered={column.covered}
                         uncovered={column.uncovered}
@@ -137,23 +138,23 @@ define([
         }
     });
 
-    var DrawPile = React.createClass({
+    var DrawView = React.createClass({
         render: function() {
             var empty = this.props.cards.length <= 0;
             return (
                 <div id="drawPile" onClick={this.props.events.draw}>
-                    <Card face={_.last(this.props.cards)} flipped={!empty}/>
+                    <CardView face={_.last(this.props.cards)} flipped={!empty}/>
                 </div>
             );
         }
     });
 
-    var WastePile = React.createClass({
+    var WasteView = React.createClass({
         render: function () {
             var first = _.first(this.props.cards);
 
             if (first) {
-                first = <Card face={first} events={this.props.events} />;
+                first = <CardView face={first} events={this.props.events} />;
             }
 
             return (
@@ -164,20 +165,20 @@ define([
         }
     });
 
-    var Foundation = React.createClass({
+    var FoundationView = React.createClass({
         render: function () {
             return (
                 <div id="foundation">
-                    <Card slot={true}/>
-                    <Card slot={true}/>
-                    <Card slot={true}/>
-                    <Card slot={true}/>
+                    <CardView slot={true}/>
+                    <CardView slot={true}/>
+                    <CardView slot={true}/>
+                    <CardView slot={true}/>
                 </div>
             );
         }
     });
 
-    var Hand = React.createClass({
+    var HandView = React.createClass({
         render: function() {
             var position = this.props.hand.position || { x: 0, y: 0 };
             transform = {
@@ -190,37 +191,36 @@ define([
 
             return (
                 <div id="hand" style={transform}>
-                    <Stack cards={this.props.hand.cards} />
+                    <StackView cards={this.props.hand.cards} />
                 </div>
             );
         }
     });
 
-    var Board = React.createClass({
+    var BoardView = React.createClass({
         getInitialState: function() {
-            return game.createBoard();
+            return Game.createBoard();
+        },
+
+        bindEvent: function(gameEvent) {
+            return function() {
+                var newBoard = gameEvent.apply(null, [].concat(this.state, _.toArray(arguments)));
+                this.setState(newBoard);
+            }.bind(this);
         },
 
         render: function() {
             var events = {
-                draw: function() {
-                    this.setState(game.drawCard(this.state));
-                }.bind(this)
+                draw: this.bindEvent(Game.drawCard)
             };
-            if (this.state.hand.cards.length > 0) {
-                events.drop = this.dropCard;
-            }
-            else {
-                events.grab = this.grabCard;
-            }
 
             return (
                 <div id="board">
-                    <DrawPile cards={this.state.draw} events={events} />
-                    <WastePile cards={this.state.waste} events={events} />
-                    <Foundation />
-                    <Tableau columns={this.state.tableau} events={events} />
-                    <Hand hand={this.state.hand} />
+                    <DrawView cards={this.state.draw} events={events} />
+                    <WasteView cards={this.state.waste} events={events} />
+                    <FoundationView />
+                    <TableauView columns={this.state.tableau} events={events} />
+                    <HandView hand={this.state.hand} />
                 </div>
             );
         },
@@ -309,7 +309,7 @@ define([
 
     return function view (containerId) {
         React.renderComponent(
-            Board(),
+            BoardView(),
             document.getElementById(containerId)
         );
     }
