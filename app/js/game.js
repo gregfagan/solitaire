@@ -23,11 +23,7 @@ define([
             draw: deck,
             waste: [],
             foundation: [ [], [], [], [] ],
-            tableau: tableau,
-            hand: {
-                cards: [],
-                position: { x: 0, y: 0 }
-            }
+            tableau: tableau
         };
     }
 
@@ -35,7 +31,7 @@ define([
         return deal(_.shuffle(Card.createDeck()));
     }
 
-    function pathFromCard(card, container, path) {
+    function pathFromCard(container, card, path) {
         path = path || [];
 
         var currentPath;
@@ -98,6 +94,26 @@ define([
         return update(board, fullOp);
     }
 
+    function canMoveCard(board, card) {
+        var path = pathFromCard(board, card);
+
+        if (board.hand.length > 0)
+            return false;
+        if (_.contains(path, "tableau") && !_.contains(path, "uncovered"))
+            return false;
+        if ((_.contains(path, "waste") || _.contains(path, "foundation")) && _.last(path) !== "0")
+            return false;
+        if (_.contains(path, "draw"))
+            return false;
+
+        return true;
+
+    }
+
+    function canRecieveCard(board, fromCard, toCard) {
+        return true;
+    }
+
     function recycleWaste(board) {
         return update(board, {
             draw: {$set: board.waste.slice(0).reverse()},
@@ -113,6 +129,11 @@ define([
     }
 
     return {
+        // check state        
+        canMoveCard: canMoveCard,
+        canRecieveCard: canRecieveCard,
+
+        // update state
         createBoard: createBoard,
         drawCard: drawCard,
         moveCard: moveCard

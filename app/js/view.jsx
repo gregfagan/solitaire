@@ -24,31 +24,6 @@ define([
     });
 
     var CardView = React.createClass({
-        getDefaultProps: function() {
-            return {
-                events: {}
-            }
-        },
-
-        onMouseDown: function(e) {
-            if (this.props.events.grab) {
-                var node = this.getDOMNode();
-                var location = { x: node.offsetLeft, y: node.offsetTop };
-                var drag = { x: e.pageX, y: e.pageY }
-                this.props.events.grab(this.props.face, location, drag);
-                e.preventDefault();
-                e.stopPropagation();
-            }
-        },
-
-        onMouseUp: function(e) {
-            if (this.props.events.drop) {
-                this.props.events.drop(this.props.face);
-                e.preventDefault();
-                e.stopPropagation();
-            }
-        },
-
         render: function() {
             var classes = React.addons.classSet({
                 'card': true,
@@ -82,8 +57,12 @@ define([
         render: function() {
             var first = _.first(this.props.cards);
             var rest = _.rest(this.props.cards);
+            var container = React.DOM.div;
 
             if (first) {
+                if (true)
+                    container = Draggable;
+
                 first = <CardView
                     face={first}
                     flipped={this.props.flipped}
@@ -98,12 +77,7 @@ define([
                     events={this.props.events} />;
             }
 
-            return (
-                <div className="stack">
-                    { rest }
-                    { first }
-                </div>
-            );
+            return container({className: "stack"}, rest, first);
         }
     });
 
@@ -178,20 +152,68 @@ define([
         }
     });
 
-    var HandView = React.createClass({
+    var Draggable = React.createClass({
+        getInitialState: function() {
+            return {
+                dragging: false
+            }
+        },
+
+        onMouseDown: function(e) {
+            if (!this.state.dragging) {
+                document.addEventListener('mousemove', this.onMouseMove);
+                document.addEventListener('mouseup', this.onMouseUp);
+
+                this.setState({
+                    dragging: true,
+                    initial: { x: e.pageX, y: e.pageY },
+                    offset: { x:0, y:0 }
+                });
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        },
+
+        onMouseUp: function(e) {
+            if (this.state.dragging) {
+                document.removeEventListener('mouseup', this.onMouseUp);
+                document.removeEventListener('mousemove', this.onMouseMove);
+
+                this.setState({
+                    dragging: false,
+                    offset: { x:0, y:0 }
+                });
+            }
+        },
+
+        onMouseMove: function(e) {
+            if (this.state.dragging) {
+                this.setState({
+                    offset: {
+                        x: e.pageX - this.state.initial.x,
+                        y: e.pageY - this.state.initial.y,
+                    }
+                })
+            }
+        },
+
         render: function() {
-            var position = this.props.hand.position || { x: 0, y: 0 };
-            transform = {
+            var transform = {
                 // TODO: use all vendor specific transform styles
-                WebkitTransform: 
-                    'translateX(' + position.x + 'px)' +
-                    'translateY(' + position.y + 'px)' +
-                    'translateZ(15px)'
+                WebkitTransform:
+                    this.state.dragging ?
+                        'translateX(' + this.state.offset.x + 'px)' +
+                        'translateY(' + this.state.offset.y + 'px)' +
+                        'translateZ(15px)'
+                    : ''
             };
 
-            return (
-                <div id="hand" style={transform}>
-                    <StackView cards={this.props.hand.cards} />
+            return this.transferPropsTo(
+                <div
+                    className="dragging"
+                    style={transform}
+                    onMouseDown={this.onMouseDown}>
+                    { this.props.children }
                 </div>
             );
         }
@@ -199,28 +221,36 @@ define([
 
     var BoardView = React.createClass({
         getInitialState: function() {
-            return Game.createBoard();
-        },
+            var that = this;
 
-        bindEvent: function(gameEvent) {
-            return function() {
-                var newBoard = gameEvent.apply(null, [].concat(this.state, _.toArray(arguments)));
-                this.setState(newBoard);
-            }.bind(this);
+            function bindEvent(gameEvent) {
+                return function() {
+                    var newBoard = gameEvent.apply(null, [].concat(this.state.board, _.toArray(arguments)));
+                    this.setState({board:newBoard});
+                }.bind(that);
+            };
+
+            return {
+                board: Game.createBoard(),
+                dragging: {
+                    position: { x:0, y:0 }
+                },
+                events: {
+                    draw: bindEvent(Game.drawCard),
+                }
+            };
         },
 
         render: function() {
-            var events = {
-                draw: this.bindEvent(Game.drawCard)
-            };
+            var board = this.state.board;
+            var events = this.state.events;
 
             return (
                 <div id="board">
-                    <DrawView cards={this.state.draw} events={events} />
-                    <WasteView cards={this.state.waste} events={events} />
+                    <DrawView cards={board.draw} events={events} />
+                    <WasteView cards={board.waste} events={events} />
                     <FoundationView />
-                    <TableauView columns={this.state.tableau} events={events} />
-                    <HandView hand={this.state.hand} />
+                    <TableauView columns={board.tableau} events={events} />
                 </div>
             );
         },
