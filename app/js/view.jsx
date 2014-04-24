@@ -5,9 +5,9 @@
 define([
     "underscore",
     "react-with-addons",
-    "game",
+    "draggable",
     "card"
-    ], function define_view (_, React, Game, Card) {
+    ], function define_view (_, React, Draggable, Card) {
 
     var FaceView = React.createClass({
         render: function() {
@@ -28,7 +28,8 @@ define([
             var classes = React.addons.classSet({
                 'card': true,
                 'flipped': this.props.flipped,
-                'coverBottom': this.props.coverBottom
+                'cascade-down': this.props.cascade === "down",
+                'cascade-none': this.props.cascade === "none"
             });
 
             var front = this.props.face ?
@@ -41,11 +42,7 @@ define([
             }
 
             return (
-                <div
-                    className={classes}
-                    onMouseDown={this.onMouseDown}
-                    onMouseUp={this.onMouseUp}
-                >
+                <div className={classes}>
                     { front }
                     { back }
                 </div>
@@ -54,30 +51,35 @@ define([
     });
 
     var StackView = React.createClass({
+        getDefaultProps: function() {
+            return { cascade: "none" };
+        },
+
         render: function() {
-            var first = _.first(this.props.cards);
-            var rest = _.rest(this.props.cards);
+            var last = _.last(this.props.cards);
+            var initial = _.initial(this.props.cards);
             var container = React.DOM.div;
 
-            if (first) {
-                if (true)
+            if (last) {
+                if (this.props.interaction.canMove(last))
                     container = Draggable;
 
-                first = <CardView
-                    face={first}
+                last = <CardView
+                    face={last}
                     flipped={this.props.flipped}
-                    coverBottom={true}
-                    events={this.props.events} />;
+                    cascade={this.props.cascade}
+                    interaction={this.props.interaction} />;
             }
 
-            if (rest.length > 0) {
-                rest = <StackView
-                    cards={rest}
+            if (initial.length > 0) {
+                initial = <StackView
+                    cards={initial}
                     flipped={this.props.flipped}
-                    events={this.props.events} />;
+                    cascade={this.props.cascade}
+                    interaction={this.props.interaction} />;
             }
 
-            return container({className: "stack"}, rest, first);
+            return this.transferPropsTo(container({className: "stack"}, last, initial));
         }
     });
 
@@ -85,8 +87,15 @@ define([
         render: function () {
             return (
                 <div className="column">
-                    <StackView cards={this.props.covered}   flipped={true} />
-                    <StackView cards={this.props.uncovered} events={this.props.events} />
+                    <StackView
+                        cards={this.props.covered}
+                        interaction={this.props.interaction}
+                        flipped={true}
+                        cascade="down" />
+                    <StackView
+                        cards={this.props.uncovered}
+                        interaction={this.props.interaction}
+                        cascade="down" />
                 </div>
             );
         }
@@ -101,7 +110,7 @@ define([
                         key={index}
                         covered={column.covered}
                         uncovered={column.uncovered}
-                        events={that.props.events} />
+                        interaction={that.props.interaction} />
                 );
             });
             return (
@@ -116,7 +125,7 @@ define([
         render: function() {
             var empty = this.props.cards.length <= 0;
             return (
-                <div id="drawPile" onClick={this.props.events.draw}>
+                <div id="drawPile" onClick={this.props.interaction.draw}>
                     <CardView face={_.last(this.props.cards)} flipped={!empty}/>
                 </div>
             );
@@ -125,17 +134,15 @@ define([
 
     var WasteView = React.createClass({
         render: function () {
-            var first = _.first(this.props.cards);
-
-            if (first) {
-                first = <CardView face={first} events={this.props.events} />;
-            }
-
-            return (
-                <div id="wastePile">
-                    { first }
-                </div>
-            );
+            if (this.props.cards.length <= 0)
+                return <div id="wastePile"/>
+            else
+                return (
+                    <StackView
+                        id="wastePile"
+                        cards={this.props.cards}
+                        interaction={this.props.interaction} />
+                );
         }
     });
 
@@ -152,194 +159,53 @@ define([
         }
     });
 
-    var Draggable = React.createClass({
-        getInitialState: function() {
-            return {
-                dragging: false
-            }
-        },
-
-        onMouseDown: function(e) {
-            if (!this.state.dragging) {
-                document.addEventListener('mousemove', this.onMouseMove);
-                document.addEventListener('mouseup', this.onMouseUp);
-
-                this.setState({
-                    dragging: true,
-                    initial: { x: e.pageX, y: e.pageY },
-                    offset: { x:0, y:0 }
-                });
-                e.preventDefault();
-                e.stopPropagation();
-            }
-        },
-
-        onMouseUp: function(e) {
-            if (this.state.dragging) {
-                document.removeEventListener('mouseup', this.onMouseUp);
-                document.removeEventListener('mousemove', this.onMouseMove);
-
-                this.setState({
-                    dragging: false,
-                    offset: { x:0, y:0 }
-                });
-            }
-        },
-
-        onMouseMove: function(e) {
-            if (this.state.dragging) {
-                this.setState({
-                    offset: {
-                        x: e.pageX - this.state.initial.x,
-                        y: e.pageY - this.state.initial.y,
-                    }
-                })
-            }
-        },
-
-        render: function() {
-            var transform = {
-                // TODO: use all vendor specific transform styles
-                WebkitTransform:
-                    this.state.dragging ?
-                        'translateX(' + this.state.offset.x + 'px)' +
-                        'translateY(' + this.state.offset.y + 'px)' +
-                        'translateZ(15px)'
-                    : ''
-            };
-
-            return this.transferPropsTo(
-                <div
-                    className="dragging"
-                    style={transform}
-                    onMouseDown={this.onMouseDown}>
-                    { this.props.children }
-                </div>
-            );
-        }
-    });
-
     var BoardView = React.createClass({
         getInitialState: function() {
-            var that = this;
-
-            function bindEvent(gameEvent) {
-                return function() {
-                    var newBoard = gameEvent.apply(null, [].concat(this.state.board, _.toArray(arguments)));
-                    this.setState({board:newBoard});
-                }.bind(that);
-            };
-
             return {
-                board: Game.createBoard(),
-                dragging: {
-                    position: { x:0, y:0 }
-                },
-                events: {
-                    draw: bindEvent(Game.drawCard),
-                }
+                board: this.props.createBoard(),
+                cardInHand: null
             };
         },
 
         render: function() {
             var board = this.state.board;
-            var events = this.state.events;
+            var interaction = {
+                draw: this.bindGameEvent(this.props.drawCard),
+
+                canMove: this.bindCapability(this.props.canMoveCard),
+                canReceive: this.bindCapability(this.props.canReceiveCard, this.state.cardInHand)
+            }
 
             return (
                 <div id="board">
-                    <DrawView cards={board.draw} events={events} />
-                    <WasteView cards={board.waste} events={events} />
+                    <DrawView cards={board.draw} interaction={interaction} />
+                    <WasteView cards={board.waste} interaction={interaction} />
                     <FoundationView />
-                    <TableauView columns={board.tableau} events={events} />
+                    <TableauView columns={board.tableau} interaction={interaction} />
                 </div>
             );
         },
 
-// TODO: reintegrate interaction
+        bindGameEvent: function bindGameEvent(gameEvent) {
+            function wrapResult(newBoard) {
+                return { board: newBoard };
+            };
 
-        // // DOM events
-        // componentDidMount: function() {
-        //     document.addEventListener('mousemove', this.onMouseMove);
-        //     document.addEventListener('mouseup', this.onMouseUp);
-        // },
+            return _.compose(
+                this.setState,
+                wrapResult,
+                _.partial(gameEvent, this.state.board)
+            ).bind(this);
+        },
 
-        // componentWillUnmount: function() {
-        //     document.removeEventListener('mouseup', this.onMouseUp);
-        //     document.removeEventListener('mousemove', this.onMouseMove);
-        // },
-
-        // onMouseUp: function(e) {
-        //     if(this.state.hand.cards.length > 0)
-        //         this.dropCard();
-        // },
-
-        // onMouseMove: function(e) {
-        //     if(this.state.hand.cards.length > 0) {
-        //         var newDrag = { x: e.pageX, y: e.pageY };
-        //         var delta = {
-        //             x: newDrag.x - this.state.drag.x,
-        //             y: newDrag.y - this.state.drag.y
-        //         };
-        //         var previousPosition = this.state.hand.position;
-        //         var newPosition = {
-        //             x: previousPosition.x + delta.x,
-        //             y: previousPosition.y + delta.y
-        //         };
-
-        //         this.setState(React.addons.update(this.state, {
-        //             hand: {
-        //                 position: {$set: newPosition}
-        //             },
-        //             drag: {$set: newDrag}
-        //         }));
-        //     }
-        // },
-
-        // // state transformations
-        // grabCard: function(card, location, dragStart) {
-        //     // TODO: bind op better (don't assume hand?)
-        //     // TODO: location busted from tableau?
-        //     var moveOp = this.moveCardOp(pathFromCard(card, this.state), ["hand", "cards"]);
-        //     var op = _.extend(moveOp, {
-        //         hand: _.extend(moveOp.hand, {
-        //             position: {$set: location}
-        //         }),
-        //         previous: {$set: this.state},
-        //         drag: {$set: dragStart}
-        //     });
-        //     this.setState(React.addons.update(this.state, op));
-        // },
-
-        // dropCard: function(target) {
-        //     // Can the target receive the hand?
-        //     var that = this;
-        //     var successful = false;
-        //     this.state.tableau.forEach(function(column, i) {
-        //         if (_.first(column.uncovered) === target) {
-        //             var colUpdate = { uncovered: {$unshift: that.state.hand.cards}};
-        //             var tabUpdate = {};
-        //             tabUpdate[i] = colUpdate;
-
-        //             that.setState(React.addons.update(that.state, {
-        //                 hand: { cards: {$set: []} },
-        //                 tableau: tabUpdate,
-        //                 previous: {$set: null}
-        //             }));
-
-        //             successful = true;
-        //         }
-        //     });
-
-        //     // Invalid target, drop hand by restoring previous state.
-        //     if (!successful) {
-        //         this.replaceState(this.state.previous);
-        //     }
-        // }
+        bindCapability: function bindCapability(gameCapability) {
+            return _.partial(gameCapability, this.state.board);
+        }
     });
 
-    return function view (containerId) {
+    return function view (game, containerId) {
         React.renderComponent(
-            BoardView(),
+            BoardView(game),
             document.getElementById(containerId)
         );
     }

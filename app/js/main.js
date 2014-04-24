@@ -1,3 +1,3 @@
-require(["view"], function(view) {
-    view("screen");
+require(["game", "view"], function(game, view) {
+    view(game, "screen");
 });

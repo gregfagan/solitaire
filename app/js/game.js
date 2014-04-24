@@ -43,12 +43,12 @@ define([
             if (container.hasOwnProperty(k)) {
                 child = container[k];
                 if (Card.isCard(child)) {
-                    if (toId(child) === Card.toId(card)) {
+                    if (Card.toId(child) === Card.toId(card)) {
                         return currentPath;
                     }
                 }
                 else {
-                    result = pathFromCard(card, child, currentPath);
+                    result = pathFromCard(child, card, currentPath);
                     if (result) {
                         return result;
                     }
@@ -97,8 +97,6 @@ define([
     function canMoveCard(board, card) {
         var path = pathFromCard(board, card);
 
-        if (board.hand.length > 0)
-            return false;
         if (_.contains(path, "tableau") && !_.contains(path, "uncovered"))
             return false;
         if ((_.contains(path, "waste") || _.contains(path, "foundation")) && _.last(path) !== "0")
@@ -107,10 +105,9 @@ define([
             return false;
 
         return true;
-
     }
 
-    function canRecieveCard(board, fromCard, toCard) {
+    function canReceiveCard(board, fromCard, toCard) {
         return true;
     }
 
@@ -131,7 +128,7 @@ define([
     return {
         // check state        
         canMoveCard: canMoveCard,
-        canRecieveCard: canRecieveCard,
+        canReceiveCard: canReceiveCard,
 
         // update state
         createBoard: createBoard,
