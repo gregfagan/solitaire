@@ -79,7 +79,11 @@ define([
                     interaction={this.props.interaction} />;
             }
 
-            return this.transferPropsTo(container({className: "stack"}, last, initial));
+            return this.transferPropsTo(container({
+                className: "stack",
+                interaction: this.props.interaction
+            },
+            last, initial));
         }
     });
 
@@ -162,8 +166,7 @@ define([
     var BoardView = React.createClass({
         getInitialState: function() {
             return {
-                board: this.props.createBoard(),
-                cardInHand: null
+                board: this.props.createBoard()
             };
         },
 
@@ -173,7 +176,10 @@ define([
                 draw: this.bindGameEvent(this.props.drawCard),
 
                 canMove: this.bindCapability(this.props.canMoveCard),
-                canReceive: this.bindCapability(this.props.canReceiveCard, this.state.cardInHand)
+                canReceive: this.bindCapability(this.props.canReceiveCard, this.state.cardInHand),
+
+                onDragBegin: this.onDragBegin,
+                onDragEnd: this.onDragEnd
             }
 
             return (
@@ -184,6 +190,20 @@ define([
                     <TableauView columns={board.tableau} interaction={interaction} />
                 </div>
             );
+        },
+
+        onDragBegin: function onDragBegin(children) {
+            React.Children.forEach(children, function(child) {
+                console.log(child);
+            });
+            this.setState({draggingCard: card});
+        },
+
+        onDragEnd: function onDragEnd(targetCard) {
+            if (this.state.draggingCard)
+                this.setState({
+                    board: this.props.moveCard(this.state.board, this.state.draggingCard, targetCard)
+                });
         },
 
         bindGameEvent: function bindGameEvent(gameEvent) {

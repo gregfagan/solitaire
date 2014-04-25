@@ -3,10 +3,12 @@
  */
 define(["react-with-addons"], function define_draggable (React) {
     var Draggable = React.createClass({
+        getDefaultProps: function() {
+            return { interaction: {} };
+        },
+
         getInitialState: function() {
-            return {
-                dragging: false
-            }
+            return { dragging: false };
         },
 
         onMouseDown: function(e) {
@@ -22,8 +24,8 @@ define(["react-with-addons"], function define_draggable (React) {
                 e.preventDefault();
                 e.stopPropagation();
 
-                if (this.props.onDragStart)
-                    this.props.onDragStart(this.props.children);
+                if (this.props.interaction.onDragBegin)
+                    this.props.interaction.onDragBegin(this.props.children);
             }
         },
 
@@ -36,6 +38,9 @@ define(["react-with-addons"], function define_draggable (React) {
                     dragging: false,
                     offset: { x:0, y:0 }
                 });
+
+                if (this.props.interaction.onDragEnd)
+                    this.props.interaction.onDragEnd();
             }
         },
 
