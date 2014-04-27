@@ -6,8 +6,9 @@ define([
     "underscore",
     "react-with-addons",
     "draggable",
+    "droptarget",
     "card"
-    ], function define_view (_, React, Draggable, Card) {
+    ], function define_view (_, React, Draggable, DropTarget, Card) {
 
     var FaceView = React.createClass({
         render: function() {
@@ -32,12 +33,12 @@ define([
                 'cascade-none': this.props.cascade === "none"
             });
 
-            var front = this.props.face ?
-                <FaceView card={this.props.face} /> :
+            var front = this.props.card ?
+                <FaceView card={this.props.card} /> :
                 <div className="side slot"></div>;
 
             var back;
-            if (this.props.face) {
+            if (this.props.card) {
                 back = <div className="side back"/>;
             }
 
@@ -58,14 +59,11 @@ define([
         render: function() {
             var last = _.last(this.props.cards);
             var initial = _.initial(this.props.cards);
-            var container = React.DOM.div;
+            var container = this.props.interaction.containerForCard(last);
 
             if (last) {
-                if (this.props.interaction.canMove(last))
-                    container = Draggable;
-
                 last = <CardView
-                    face={last}
+                    card={last}
                     flipped={this.props.flipped}
                     cascade={this.props.cascade}
                     interaction={this.props.interaction} />;
@@ -130,7 +128,7 @@ define([
             var empty = this.props.cards.length <= 0;
             return (
                 <div id="drawPile" onClick={this.props.interaction.draw}>
-                    <CardView face={_.last(this.props.cards)} flipped={!empty}/>
+                    <CardView card={_.last(this.props.cards)} flipped={!empty}/>
                 </div>
             );
         }
@@ -172,14 +170,26 @@ define([
 
         render: function() {
             var board = this.state.board;
+            var draggingCard = this.state.draggingCard;
             var interaction = {
                 draw: this.bindGameEvent(this.props.drawCard),
 
-                canMove: this.bindCapability(this.props.canMoveCard),
-                canReceive: this.bindCapability(this.props.canReceiveCard, this.state.cardInHand),
+                containerForCard: function (card) {
+                    if (card) {
+                        if (draggingCard && draggingCard !== card && this.canReceive(card))
+                            return DropTarget;
+                        else if (this.canMove(card))
+                            return Draggable;
+                    }
+                    
+                    return React.DOM.div;
+                },
 
-                onDragBegin: this.onDragBegin,
-                onDragEnd: this.onDragEnd
+                canMove: this.bindCapability(this.props.canMoveCard),
+                canReceive: this.bindCapability(this.props.canReceiveCard, draggingCard),
+
+                onDragBegin: _.compose(this.onDragBegin, extractCardFromChildren),
+                onDragEnd: _.compose(this.onDragEnd, extractCardFromChildren)
             }
 
             return (
@@ -192,17 +202,19 @@ define([
             );
         },
 
-        onDragBegin: function onDragBegin(children) {
-            React.Children.forEach(children, function(child) {
-                console.log(child);
-            });
+        onDragBegin: function onDragBegin(card) {
             this.setState({draggingCard: card});
         },
 
         onDragEnd: function onDragEnd(targetCard) {
-            if (this.state.draggingCard)
+            if (this.state.draggingCard && targetCard)
                 this.setState({
-                    board: this.props.moveCard(this.state.board, this.state.draggingCard, targetCard)
+                    board: this.props.moveCard(
+                        this.state.board,
+                        this.state.draggingCard,
+                        targetCard
+                    ),
+                    draggingCard: null
                 });
         },
 
@@ -222,6 +234,14 @@ define([
             return _.partial(gameCapability, this.state.board);
         }
     });
+
+    function extractCardFromChildren(children) {
+        var card;
+        React.Children.forEach(children, function(child) {
+            if (!card) card = child.props.card;
+        });
+        return card;
+    };
 
     return function view (game, containerId) {
         React.renderComponent(

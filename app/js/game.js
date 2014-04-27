@@ -79,19 +79,23 @@ define([
         return result;
     }
 
-    function moveCard(board, from, to) {
-        if (!_.isNumber(_.last(from)))
+    function moveCardPaths(board, from, to) {
+        var fromIdx = parseInt(_.last(from), 10);
+        if (_.isNaN(fromIdx)) {
             from.push("0");
+            fromIdx = 0;
+        }
 
-        var count = _.last(from) + 1;
-        var cards = getIn(board, _.initial(from)).slice(0, count);
+        var count = fromIdx + 1;
+        var cards = getIn(board, _.initial(from)).slice(0, count).reverse();
 
         var cut = buildOp(board, _.initial(from), {$splice: [[0, count]]});
-        var paste = buildOp(board, to, {$unshift: cards});
+        var paste = buildOp(board, _.initial(to), {$unshift: cards});
 
-        var fullOp = _.extend(cut, paste);
+        var postCut = update(board, cut);
+        var postPaste = update(postCut, paste);
 
-        return update(board, fullOp);
+        return postPaste;
     }
 
     function canMoveCard(board, card) {
@@ -105,6 +109,14 @@ define([
             return false;
 
         return true;
+    }
+
+    function moveCard(board, fromCard, toCard) {
+        return moveCardPaths(
+            board,
+            pathFromCard(board, fromCard),
+            pathFromCard(board, toCard)
+        );
     }
 
     function canReceiveCard(board, fromCard, toCard) {

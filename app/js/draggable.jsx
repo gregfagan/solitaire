@@ -38,9 +38,6 @@ define(["react-with-addons"], function define_draggable (React) {
                     dragging: false,
                     offset: { x:0, y:0 }
                 });
-
-                if (this.props.interaction.onDragEnd)
-                    this.props.interaction.onDragEnd();
             }
         },
 
