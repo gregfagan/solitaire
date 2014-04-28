@@ -34,10 +34,12 @@ define(["react-with-addons"], function define_draggable (React) {
                 document.removeEventListener('mouseup', this.onMouseUp);
                 document.removeEventListener('mousemove', this.onMouseMove);
 
-                this.setState({
-                    dragging: false,
-                    offset: { x:0, y:0 }
-                });
+                if (this.isMounted()) {
+                    this.setState({
+                        dragging: false,
+                        offset: { x:0, y:0 }
+                    });
+                }
             }
         },
 
