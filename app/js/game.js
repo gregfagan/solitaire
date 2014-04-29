@@ -86,6 +86,9 @@ define([
             fromIdx = 0;
         }
 
+        if (_.isNaN(parseInt(_.last(to), 10)))
+            to.push("0");
+
         var count = fromIdx + 1;
         var cards = getIn(board, _.initial(from)).slice(0, count).reverse();
 
@@ -111,12 +114,10 @@ define([
         return true;
     }
 
-    function moveCard(board, fromCard, toCard) {
-        return moveCardPaths(
-            board,
-            pathFromCard(board, fromCard),
-            pathFromCard(board, toCard)
-        );
+    function moveCard(board, from, to) {
+        if (Card.isCard(from)) from = pathFromCard(board, from);
+        if (Card.isCard(to)) to = pathFromCard(board, to);
+        return moveCardPaths(board, from, to);
     }
 
     function canReceiveCard(board, fromCard, toCard) {
