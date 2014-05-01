@@ -67,7 +67,7 @@ define(["react-with-addons"], function define_draggable (React) {
 
             return this.transferPropsTo(
                 <div
-                    className={this.state.dragging ? "dragging" : ""}
+                    className={this.state.dragging ? "dragging" : "draggable"}
                     style={transform}
                     onMouseDown={this.onMouseDown}>
                     { this.props.children }

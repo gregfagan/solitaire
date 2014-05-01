@@ -4,6 +4,10 @@ define(function() {
             return card.suit && card.rank;
         },
 
+        areEqual: function(a, b) {
+            return a.suit === b.suit && a.rank === b.rank;
+        },
+
         isRed: function isRed(card) {
             return card.suit === '♥' || card.suit === '♦';
         },

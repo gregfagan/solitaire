@@ -143,7 +143,8 @@ define([
                     <StackView
                         id="wastePile"
                         cards={this.props.cards}
-                        interaction={this.props.interaction} />
+                        interaction={this.props.interaction}
+                        cascade="down" />
                 );
         }
     });
@@ -175,11 +176,17 @@ define([
                 draw: this.bindGameEvent(this.props.drawCard),
 
                 containerForCard: function (card) {
+                    if(card && draggingCard && Card.areEqual(draggingCard, card)) {
+                        console.log(card);
+                    }
+
                     if (card) {
-                        if (draggingCard && draggingCard !== card && this.canReceive(card))
+                        if (draggingCard && !Card.areEqual(draggingCard, card) && this.canReceive(card)) {
                             return DropTarget;
-                        else if (this.canMove(card))
+                        }
+                        else if (this.canMove(card)) {
                             return Draggable;
+                        }
                     }
                     
                     return React.DOM.div;
@@ -207,15 +214,21 @@ define([
         },
 
         onDragEnd: function onDragEnd(targetCard) {
-            if (this.state.draggingCard && targetCard)
-                this.setState({
-                    board: this.props.moveCard(
+            if (this.state.draggingCard) {
+                var newState = {
+                    draggingCard: null
+                }
+
+                if (targetCard) {
+                    newState.board = this.props.moveCard(
                         this.state.board,
                         this.state.draggingCard,
                         targetCard
-                    ),
-                    draggingCard: null
-                });
+                    );
+                }
+
+                this.setState(newState);
+            }
         },
 
         bindGameEvent: function bindGameEvent(gameEvent) {
