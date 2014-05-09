@@ -121,6 +121,11 @@ define([
     }
 
     function canReceiveCard(board, fromCard, toCard) {
+        var toPath = pathFromCard(board, toCard);
+
+        if (_.contains(toPath, "waste"))
+            return false;
+
         return true;
     }
 

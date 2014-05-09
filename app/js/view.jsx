@@ -143,8 +143,7 @@ define([
                     <StackView
                         id="wastePile"
                         cards={this.props.cards}
-                        interaction={this.props.interaction}
-                        cascade="down" />
+                        interaction={this.props.interaction} />
                 );
         }
     });
@@ -176,12 +175,8 @@ define([
                 draw: this.bindGameEvent(this.props.drawCard),
 
                 containerForCard: function (card) {
-                    if(card && draggingCard && Card.areEqual(draggingCard, card)) {
-                        console.log(card);
-                    }
-
                     if (card) {
-                        if (draggingCard && !Card.areEqual(draggingCard, card) && this.canReceive(card)) {
+                        if (draggingCard && !Card.areEqual(draggingCard, card) && this.canReceive(draggingCard, card)) {
                             return DropTarget;
                         }
                         else if (this.canMove(card)) {
@@ -193,7 +188,7 @@ define([
                 },
 
                 canMove: this.bindCapability(this.props.canMoveCard),
-                canReceive: this.bindCapability(this.props.canReceiveCard, draggingCard),
+                canReceive: this.bindCapability(this.props.canReceiveCard),
 
                 onDragBegin: _.compose(this.onDragBegin, extractCardFromChildren),
                 onDragEnd: _.compose(this.onDragEnd, extractCardFromChildren)
