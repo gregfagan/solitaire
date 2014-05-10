@@ -1,7 +1,7 @@
 define([
     "underscore",
     "update",
-    "card"
+    "game/card"
     ], function define_game (_, update, Card){
 
     function deal(deck) {

@@ -34,7 +34,7 @@ module.exports = function(grunt) {
 
         react: {
             jsx: {
-                dest: 'tmp/js',
+                dest: 'tmp/js/components',
                 cwd: 'app',
                 src: [ '**/*.jsx' ],
                 ext: '.js',
@@ -49,7 +49,7 @@ module.exports = function(grunt) {
                 src: [
                     '**',
                     '!**/*.styl',
-                    '!jsx/**'
+                    '!**/*.jsx'
                 ],
                 dest: 'tmp',
                 expand: true

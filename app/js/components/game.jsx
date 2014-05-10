@@ -5,85 +5,13 @@
 define([
     "underscore",
     "react-with-addons",
-    "draggable",
-    "droptarget",
-    "card"
-    ], function define_view (_, React, Draggable, DropTarget, Card) {
-
-    var FaceView = React.createClass({
-        render: function() {
-            var symbol = Card.toId(this.props.card);
-            var rotate = { WebkitTransform: "rotateZ(180deg)" };
-            return (
-                <div className={"side face " + (Card.isRed(this.props.card) ? "red" : "black")}>
-                    <figure className="side corner">{symbol}</figure>
-                    <figure className="side corner" style={rotate}>{symbol}</figure>
-                    <figure className="side center">{Card.suit(this.props.card)}</figure>
-                </div>
-            );
-        }
-    });
-
-    var CardView = React.createClass({
-        render: function() {
-            var classes = React.addons.classSet({
-                'card': true,
-                'flipped': this.props.flipped,
-                'cascade-down': this.props.cascade === "down",
-                'cascade-none': this.props.cascade === "none"
-            });
-
-            var front = this.props.card ?
-                <FaceView card={this.props.card} /> :
-                <div className="side slot"></div>;
-
-            var back;
-            if (this.props.card) {
-                back = <div className="side back"/>;
-            }
-
-            return (
-                <div className={classes}>
-                    { front }
-                    { back }
-                </div>
-            );
-        }
-    });
-
-    var StackView = React.createClass({
-        getDefaultProps: function() {
-            return { cascade: "none" };
-        },
-
-        render: function() {
-            var last = _.last(this.props.cards);
-            var initial = _.initial(this.props.cards);
-            var container = this.props.interaction.containerForCard(last);
-
-            if (last) {
-                last = <CardView
-                    card={last}
-                    flipped={this.props.flipped}
-                    cascade={this.props.cascade}
-                    interaction={this.props.interaction} />;
-            }
-
-            if (initial.length > 0) {
-                initial = <StackView
-                    cards={initial}
-                    flipped={this.props.flipped}
-                    cascade={this.props.cascade}
-                    interaction={this.props.interaction} />;
-            }
-
-            return this.transferPropsTo(container({
-                className: "stack",
-                interaction: this.props.interaction
-            },
-            last, initial));
-        }
-    });
+    "game/card",
+    "components/draggable",
+    "components/droptarget",
+    "components/stack",
+    "components/card"
+],
+function (_, React, Card, Draggable, DropTarget, StackView, CardView) {
 
     var ColumnView = React.createClass({
         render: function () {
