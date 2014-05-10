@@ -1,5 +1,5 @@
 /**
- * @jsx React.DOM 
+ * @jsx React.DOM
  */
 
 define([
@@ -89,6 +89,7 @@ define([
         render: function () {
             return (
                 <div className="column">
+                    <CardView slot={true} cascade="none"/>
                     <StackView
                         cards={this.props.covered}
                         interaction={this.props.interaction}
@@ -150,12 +151,20 @@ define([
 
     var FoundationView = React.createClass({
         render: function () {
+            var that = this;
+            var stacks = this.props.cards.map(function(stack, index) {
+                return (
+                    <div key={index} className="card">
+                        <CardView slot={true} cascade="none"/>
+                        <StackView
+                            cards={stack}
+                            interaction={that.props.interaction} />
+                    </div>
+                );
+            });
             return (
                 <div id="foundation">
-                    <CardView slot={true}/>
-                    <CardView slot={true}/>
-                    <CardView slot={true}/>
-                    <CardView slot={true}/>
+                    { stacks }
                 </div>
             );
         }
@@ -183,7 +192,7 @@ define([
                             return Draggable;
                         }
                     }
-                    
+
                     return React.DOM.div;
                 },
 
@@ -198,7 +207,7 @@ define([
                 <div id="board">
                     <DrawView cards={board.draw} interaction={interaction} />
                     <WasteView cards={board.waste} interaction={interaction} />
-                    <FoundationView />
+                    <FoundationView cards={board.foundation} interaction={interaction} />
                     <TableauView columns={board.tableau} interaction={interaction} />
                 </div>
             );
