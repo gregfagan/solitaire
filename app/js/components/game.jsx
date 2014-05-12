@@ -17,13 +17,18 @@ function (_, React, Card, Draggable, DropTarget, StackView, CardView) {
         render: function () {
             return (
                 <div className="column">
-                    <CardView slot={true} cascade="none"/>
+                    <CardView
+                        path={this.props.path.concat("uncovered")}
+                        slot={true}
+                        cascade="none" />
                     <StackView
+                        path={this.props.path.concat("covered")}
                         cards={this.props.covered}
                         interaction={this.props.interaction}
                         flipped={true}
                         cascade="down" />
                     <StackView
+                        path={this.props.path.concat("uncovered")}
                         cards={this.props.uncovered}
                         interaction={this.props.interaction}
                         cascade="down" />
@@ -35,10 +40,13 @@ function (_, React, Card, Draggable, DropTarget, StackView, CardView) {
     var TableauView = React.createClass({
         render: function () {
             var that = this;
+            var p = this.props.path.concat("tableau");
             var columns = this.props.columns.map(function (column, index) {
+                var path = p.concat(index);
                 return (
                     <ColumnView
                         key={index}
+                        path={path}
                         covered={column.covered}
                         uncovered={column.uncovered}
                         interaction={that.props.interaction} />
@@ -71,6 +79,7 @@ function (_, React, Card, Draggable, DropTarget, StackView, CardView) {
                 return (
                     <StackView
                         id="wastePile"
+                        path={this.props.path.concat("waste")}
                         cards={this.props.cards}
                         interaction={this.props.interaction} />
                 );
@@ -80,11 +89,17 @@ function (_, React, Card, Draggable, DropTarget, StackView, CardView) {
     var FoundationView = React.createClass({
         render: function () {
             var that = this;
+            var p = this.props.path.concat("foundation");
             var stacks = this.props.cards.map(function(stack, index) {
+                var path = p.concat(index);
                 return (
                     <div key={index} className="card">
-                        <CardView slot={true} cascade="none"/>
+                        <CardView
+                            path={path}
+                            slot={true}
+                            cascade="none" />
                         <StackView
+                            path={path}
                             cards={stack}
                             interaction={that.props.interaction} />
                     </div>
@@ -107,16 +122,16 @@ function (_, React, Card, Draggable, DropTarget, StackView, CardView) {
 
         render: function() {
             var board = this.state.board;
-            var draggingCard = this.state.draggingCard;
+            var draggingPath = this.state.draggingPath;
             var interaction = {
                 draw: this.bindGameEvent(this.props.drawCard),
 
-                containerForCard: function (card) {
-                    if (card) {
-                        if (draggingCard && !Card.areEqual(draggingCard, card) && this.canReceive(draggingCard, card)) {
+                containerForCard: function (path) {
+                    if (path) {
+                        if (draggingPath && !_.isEqual(draggingPath, path) && this.canReceive(draggingPath, path)) {
                             return DropTarget;
                         }
-                        else if (this.canMove(card)) {
+                        else if (this.canMove(path)) {
                             return Draggable;
                         }
                     }
@@ -127,35 +142,35 @@ function (_, React, Card, Draggable, DropTarget, StackView, CardView) {
                 canMove: this.bindCapability(this.props.canMoveCard),
                 canReceive: this.bindCapability(this.props.canReceiveCard),
 
-                onDragBegin: _.compose(this.onDragBegin, extractCardFromChildren),
-                onDragEnd: _.compose(this.onDragEnd, extractCardFromChildren)
+                onDragBegin: _.compose(this.onDragBegin, extractPathFromChildren),
+                onDragEnd: _.compose(this.onDragEnd, extractPathFromChildren)
             }
 
             return (
                 <div id="board">
-                    <DrawView cards={board.draw} interaction={interaction} />
-                    <WasteView cards={board.waste} interaction={interaction} />
-                    <FoundationView cards={board.foundation} interaction={interaction} />
-                    <TableauView columns={board.tableau} interaction={interaction} />
+                    <DrawView path={[]} cards={board.draw} interaction={interaction} />
+                    <WasteView path={[]} cards={board.waste} interaction={interaction} />
+                    <FoundationView path={[]} cards={board.foundation} interaction={interaction} />
+                    <TableauView path={[]} columns={board.tableau} interaction={interaction} />
                 </div>
             );
         },
 
-        onDragBegin: function onDragBegin(card) {
-            this.setState({draggingCard: card});
+        onDragBegin: function onDragBegin(path) {
+            this.setState({draggingPath: path});
         },
 
-        onDragEnd: function onDragEnd(targetCard) {
-            if (this.state.draggingCard) {
+        onDragEnd: function onDragEnd(targetPath) {
+            if (this.state.draggingPath) {
                 var newState = {
-                    draggingCard: null
+                    draggingPath: null
                 }
 
-                if (targetCard) {
+                if (targetPath) {
                     newState.board = this.props.moveCard(
                         this.state.board,
-                        this.state.draggingCard,
-                        targetCard
+                        this.state.draggingPath,
+                        targetPath
                     );
                 }
 
@@ -180,12 +195,12 @@ function (_, React, Card, Draggable, DropTarget, StackView, CardView) {
         }
     });
 
-    function extractCardFromChildren(children) {
-        var card;
+    function extractPathFromChildren(children) {
+        var path;
         React.Children.forEach(children, function(child) {
-            if (!card) card = child.props.card;
+            if (!path && child) path = child.props.path;
         });
-        return card;
+        return path;
     };
 
     return function view (game, containerId) {

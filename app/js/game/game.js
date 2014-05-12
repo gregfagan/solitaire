@@ -101,12 +101,10 @@ define([
         return postPaste;
     }
 
-    function canMoveCard(board, card) {
-        var path = pathFromCard(board, card);
-
+    function canMoveCard(board, path) {
         if (_.contains(path, "tableau") && !_.contains(path, "uncovered"))
             return false;
-        if ((_.contains(path, "waste") || _.contains(path, "foundation")) && _.last(path) !== "0")
+        if ((_.contains(path, "waste") || _.contains(path, "foundation")) && _.last(path) !== 0)
             return false;
         if (_.contains(path, "draw"))
             return false;
@@ -120,12 +118,20 @@ define([
         return moveCardPaths(board, from, to);
     }
 
-    function canReceiveCard(board, fromCard, toCard) {
-        var fromPath = pathFromCard(board, fromCard);
-        var toPath = pathFromCard(board, toCard);
+    function canReceiveCard(board, from, to) {
+        if (_.last(to) !== 0)
+            return false;
 
-        if (_.contains(toPath, "foundation"))
+        var fromCard = getIn(board, from);
+        var toCard = getIn(board, to);
+
+        if (_.contains(to, "foundation"))
             return true;
+        else if (_.contains(to, "uncovered") &&
+            fromCard && toCard && 
+            Card.isRed(fromCard) !== Card.isRed(toCard)) {
+            return true;
+        }
 
         return false;
     }

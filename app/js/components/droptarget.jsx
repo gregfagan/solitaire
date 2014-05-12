@@ -11,7 +11,7 @@ define(["react-with-addons"], function define_dropTarget (React) {
 
         render: function() {
             return this.transferPropsTo(
-                <div onMouseUp={this.onMouseUp}>
+                <div className="card dropTarget" onMouseUp={this.onMouseUp}>
                     { this.props.children }
                 </div>
             );
