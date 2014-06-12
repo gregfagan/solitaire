@@ -138,7 +138,7 @@ define([
         var fromCard = getIn(board, from);
         var toCard = getIn(board, to);
 
-        if (_.contains(to, "foundation")) {
+        if (_.contains(to, "foundation") && _.last(from) === 0) {
             if (Card.doesFoundationStack(fromCard, toCard)) {
                 return true;
             }
