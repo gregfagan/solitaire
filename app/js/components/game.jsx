@@ -116,7 +116,8 @@ function (_, React, Card, Draggable, DropTarget, StackView, CardView) {
     var BoardView = React.createClass({
         getInitialState: function() {
             return {
-                board: this.props.createBoard()
+                board: this.props.createBoard(),
+                draggingPath: null
             };
         },
 
