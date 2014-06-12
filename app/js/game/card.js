@@ -38,7 +38,14 @@ define(function() {
     }
 
     function doesFoundationStack(fromCard, toCard) {
+        if (!fromCard || !toCard) return false;
 
+        var fromRankIdx = ranks.indexOf(rank(fromCard));
+        var toRankIdx = ranks.indexOf(rank(toCard));
+        var isNextRank = (fromRankIdx - 1) === toRankIdx;
+        var isSameSuit = suit(fromCard) === suit(toCard);
+
+        return isNextRank && isSameSuit;
     }
 
     function createDeck() {
