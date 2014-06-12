@@ -16,7 +16,7 @@ function (_, React, Card, Draggable, DropTarget, StackView, CardView) {
     var ColumnView = React.createClass({
         render: function () {
             return (
-                <div className="column">
+                <div className="card column">
                     <CardView
                         path={this.props.path.concat("uncovered")}
                         slot={true}
