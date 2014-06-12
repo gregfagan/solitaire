@@ -205,6 +205,9 @@ function (_, React, Card, Draggable, DropTarget, StackView, CardView) {
     };
 
     return function view (game, containerId) {
+        // The React dev tools need access to the React object on window
+        window.React = React;
+
         React.renderComponent(
             BoardView(game),
             document.getElementById(containerId)
