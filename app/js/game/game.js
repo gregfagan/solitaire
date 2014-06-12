@@ -115,7 +115,20 @@ define([
     function moveCard(board, from, to) {
         if (Card.isCard(from)) from = pathFromCard(board, from);
         if (Card.isCard(to)) to = pathFromCard(board, to);
-        return moveCardPaths(board, from, to);
+        board = moveCardPaths(board, from, to);
+
+        if (_.contains(from, "tableau")) {
+            board = revealUncoveredCards(board);
+        }
+
+        return board;
+    }
+
+    function columnFromPath(path) {
+        if (path[0] === "tableau")
+            return path[1];
+
+        return null;
     }
 
     function canReceiveCard(board, from, to) {
@@ -127,13 +140,34 @@ define([
 
         if (_.contains(to, "foundation"))
             return true;
-        else if (_.contains(to, "uncovered") &&
-            fromCard && toCard && 
-            Card.isRed(fromCard) !== Card.isRed(toCard)) {
-            return true;
+        else if (_.contains(to, "uncovered")) {
+            if (Card.doesTableauStack(fromCard, toCard)) {
+                return true;
+            }
+            else if (
+                Card.rank(fromCard) === 'K' &&
+                board.tableau[columnFromPath(to)].covered.length === 0
+            ) {
+                return true;
+            }
         }
 
         return false;
+    }
+
+    function revealUncoveredCards(board) {
+        board.tableau.forEach(function(column, i) {
+            if (column.uncovered.length === 0 &&
+                column.covered.length > 0) {
+                board = moveCard(
+                    board,
+                    ["tableau", i, "covered", "0"],
+                    ["tableau", i, "uncovered", "0"]
+                );
+            }
+        });
+
+        return board;
     }
 
     function recycleWaste(board) {
