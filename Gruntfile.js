@@ -43,13 +43,20 @@ module.exports = function(grunt) {
             }
         },
 
+        shell: {
+            cards: {
+                command: './buildCards.sh'
+            }
+        },
+
         copy: {
             build: {
                 cwd: 'app',
                 src: [
                     '**',
                     '!**/*.styl',
-                    '!**/*.jsx'
+                    '!**/*.jsx',
+                    '!**/*.svg'
                 ],
                 dest: 'tmp',
                 expand: true
@@ -147,6 +154,7 @@ module.exports = function(grunt) {
             grunt.task.run([
                 'jshint',
                 'react',
+                'shell',
                 'copy:build',
                 'copy:bower',
                 'stylus',

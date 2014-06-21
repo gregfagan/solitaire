@@ -1,5 +1,6 @@
 define(function() {
-    var suits = ['♣', '♠', '♥', '♦'];
+    var suits   = ['♣', '♠', '♥', '♦'];
+    var suits_c = ['C', 'S', 'H', 'D'];
     var ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
     function isCard(card) {
@@ -20,6 +21,10 @@ define(function() {
 
     function suit(card) {
         return card.suit;
+    }
+
+    function suit_c(card) {
+        return suits_c[suits.indexOf(card.suit)];
     }
 
     function rank(card) {
@@ -66,6 +71,7 @@ define(function() {
         isRed: isRed,
         toId: toId,
         suit: suit,
+        suit_c: suit_c,
         rank: rank,
         doesTableauStack: doesTableauStack,
         doesFoundationStack: doesFoundationStack,
