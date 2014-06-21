@@ -5,9 +5,10 @@
 define([
     "underscore",
     "react-with-addons",
+    "components/draganddrop",
     "components/card"
 ],
-function (_, React, CardView) {
+function (_, React, DragAndDrop, CardView) {
 
     var StackView = React.createClass({
         getDefaultProps: function() {
@@ -17,12 +18,10 @@ function (_, React, CardView) {
         render: function() {
             var last = _.last(this.props.cards);
             var initial = _.initial(this.props.cards);
-            var container = React.DOM.div;
 
             var path;
             if (this.props.path) {
                 path = this.props.path.concat(initial.length);
-                container = this.props.interaction.containerForCard(path);
             }
 
             if (last) {
@@ -45,9 +44,11 @@ function (_, React, CardView) {
                     interaction={this.props.interaction} />;
             }
 
-            return this.transferPropsTo(container({
+            return this.transferPropsTo(DragAndDrop({
                 className: "stack",
-                interaction: this.props.interaction
+                interaction: this.props.interaction,
+                draggable: this.props.interaction.isCardDraggable(path),
+                dropTarget: this.props.interaction.isCardDropTarget(path)
             },
             last, initial));
         }

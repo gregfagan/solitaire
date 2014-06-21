@@ -6,12 +6,10 @@ define([
     "underscore",
     "react-with-addons",
     "game/card",
-    "components/draggable",
-    "components/droptarget",
     "components/stack",
     "components/card"
 ],
-function (_, React, Card, Draggable, DropTarget, StackView, CardView) {
+function (_, React, Card, StackView, CardView) {
 
     var ColumnView = React.createClass({
         render: function () {
@@ -127,17 +125,21 @@ function (_, React, Card, Draggable, DropTarget, StackView, CardView) {
             var interaction = {
                 draw: this.bindGameEvent(this.props.drawCard),
 
-                containerForCard: function (path) {
-                    if (path) {
-                        if (draggingPath && !_.isEqual(draggingPath, path) && this.canReceive(draggingPath, path)) {
-                            return DropTarget;
-                        }
-                        else if (this.canMove(path)) {
-                            return Draggable;
-                        }
-                    }
+                isCardDraggable: function (path) {
+                    if (!path)
+                        return false;
+                    if (draggingPath && !_.isEqual(draggingPath, path))
+                        return false;
+                    return this.canMove(path);
+                },
 
-                    return React.DOM.div;
+                isCardDropTarget: function(path) {
+                    if (!path)
+                        return false;
+                    if (draggingPath && !_.isEqual(draggingPath, path))
+                        return this.canReceive(draggingPath, path);
+
+                    return false;
                 },
 
                 canMove: this.bindCapability(this.props.canMoveCard),

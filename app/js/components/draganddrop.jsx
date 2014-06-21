@@ -1,8 +1,8 @@
 /**
  * @jsx React.DOM
  */
-define(["react-with-addons"], function define_draggable (React) {
-    var Draggable = React.createClass({
+define(["react-with-addons"], function define_DragAndDrop (React) {
+    var DragAndDrop = React.createClass({
         getDefaultProps: function() {
             return { interaction: {} };
         },
@@ -12,9 +12,9 @@ define(["react-with-addons"], function define_draggable (React) {
         },
 
         onMouseDown: function(e) {
-            if (!this.state.dragging) {
-                document.addEventListener('mousemove', this.onMouseMove);
-                document.addEventListener('mouseup', this.onMouseUp);
+            if (this.props.draggable && !this.state.dragging) {
+                document.addEventListener('mousemove', this.onGlobalMouseMove);
+                document.addEventListener('mouseup', this.onGlobalMouseUp);
 
                 this.setState({
                     dragging: true,
@@ -30,9 +30,15 @@ define(["react-with-addons"], function define_draggable (React) {
         },
 
         onMouseUp: function(e) {
+            if(this.props.dropTarget && this.props.interaction.onDragEnd) {
+                this.props.interaction.onDragEnd(this.props.children);
+            }
+        },
+
+        onGlobalMouseUp: function(e) {
             if (this.state.dragging) {
-                document.removeEventListener('mouseup', this.onMouseUp);
-                document.removeEventListener('mousemove', this.onMouseMove);
+                document.removeEventListener('mouseup', this.onGlobalMouseUp);
+                document.removeEventListener('mousemove', this.onGlobalMouseMove);
 
                 if (this.isMounted()) {
                     this.setState({
@@ -47,7 +53,7 @@ define(["react-with-addons"], function define_draggable (React) {
             }
         },
 
-        onMouseMove: function(e) {
+        onGlobalMouseMove: function(e) {
             if (this.state.dragging) {
                 this.setState({
                     offset: {
@@ -69,16 +75,24 @@ define(["react-with-addons"], function define_draggable (React) {
                     : ''
             };
 
+            var classes = React.addons.classSet({
+                'draggable': this.props.draggable,
+                'dragging': this.state.dragging,
+                'dropTarget': this.props.dropTarget,
+                'card': this.props.dropTarget
+            })
+
             return this.transferPropsTo(
                 <div
-                    className={this.state.dragging ? "dragging" : "draggable"}
+                    className={classes}
                     style={transform}
-                    onMouseDown={this.onMouseDown}>
+                    onMouseDown={this.onMouseDown}
+                    onMouseUp={this.onMouseUp}>
                     { this.props.children }
                 </div>
             );
         }
     });
 
-    return Draggable;
+    return DragAndDrop;
 });
