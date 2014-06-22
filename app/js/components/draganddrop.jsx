@@ -1,7 +1,9 @@
 /**
  * @jsx React.DOM
  */
-define(["react-with-addons"], function define_DragAndDrop (React) {
+define(["react-with-addons", "util/transform"], function define_DragAndDrop (React, transform) {
+    var dragHeight = 20;
+
     var DragAndDrop = React.createClass({
         getDefaultProps: function() {
             return { interaction: {} };
@@ -65,15 +67,10 @@ define(["react-with-addons"], function define_DragAndDrop (React) {
         },
 
         render: function() {
-            var transform = {
-                // TODO: use all vendor specific transform styles
-                WebkitTransform:
-                    this.state.dragging ?
-                        'translateX(' + this.state.offset.x + 'px)' +
-                        'translateY(' + this.state.offset.y + 'px)' +
-                        'translateZ(15px)'
-                    : ''
-            };
+            var t = 
+                this.state.dragging ?
+                transform(this.state.offset.x, this.state.offset.y, dragHeight) :
+                transform(0, 0, this.props.z);
 
             var classes = React.addons.classSet({
                 'draggable': this.props.draggable,
@@ -85,7 +82,7 @@ define(["react-with-addons"], function define_DragAndDrop (React) {
             return this.transferPropsTo(
                 <div
                     className={classes}
-                    style={transform}
+                    style={t}
                     onMouseDown={this.onMouseDown}
                     onMouseUp={this.onMouseUp}>
                     { this.props.children }

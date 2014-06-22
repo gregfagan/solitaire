@@ -29,7 +29,8 @@ function (_, React, Card, StackView, CardView) {
                         path={this.props.path.concat("uncovered")}
                         cards={this.props.uncovered}
                         interaction={this.props.interaction}
-                        cascade="down" />
+                        cascade="down"
+                        z={(this.props.covered.length) * Card.thickness} />
                 </div>
             );
         }
@@ -62,9 +63,14 @@ function (_, React, Card, StackView, CardView) {
         render: function() {
             var empty = this.props.cards.length <= 0;
             return (
-                <div id="drawPile" onClick={this.props.interaction.draw}>
-                    <CardView card={_.last(this.props.cards)} flipped={!empty}/>
-                </div>
+                <StackView
+                    id="drawPile"
+                    className="card"
+                    path={this.props.path.concat("draw")}
+                    interaction={this.props.interaction}
+                    onClick={this.props.interaction.draw}
+                    cards={this.props.cards}
+                    flipped={!empty} />
             );
         }
     });

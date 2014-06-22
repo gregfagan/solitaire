@@ -3,6 +3,14 @@ define(function() {
     var suits_c = ['C', 'S', 'H', 'D'];
     var ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
+    // This value was calculated by taking the measurements found here:
+    //      http://www.gripboard.com/index.php?showtopic=41080
+    // and the current pixel count of a card width (2.5em/inches/90 pixels)
+    // to find a ratio between inches and pixels.
+    // TODO: This should be calculated at runtime so that it can change with
+    // card size (which should scale with viewport)
+    var thickness = 0.430615385;
+
     function isCard(card) {
         return card.suit && card.rank;
     }
@@ -73,6 +81,7 @@ define(function() {
         suit: suit,
         suit_c: suit_c,
         rank: rank,
+        thickness: thickness,
         doesTableauStack: doesTableauStack,
         doesFoundationStack: doesFoundationStack,
         createDeck: createDeck
