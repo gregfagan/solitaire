@@ -63,14 +63,18 @@ function (_, React, Card, StackView, CardView) {
         render: function() {
             var empty = this.props.cards.length <= 0;
             return (
-                <StackView
-                    id="drawPile"
-                    className="card"
-                    path={this.props.path.concat("draw")}
-                    interaction={this.props.interaction}
-                    onClick={this.props.interaction.draw}
-                    cards={this.props.cards}
-                    flipped={!empty} />
+                <div id="drawPile" onClick={this.props.interaction.draw}>
+                    <CardView
+                        path={this.props.path.concat("uncovered")}
+                        slot={true}
+                        cascade="none" />
+                    <StackView
+                        className="card"
+                        path={this.props.path.concat("draw")}
+                        interaction={this.props.interaction}
+                        cards={this.props.cards}
+                        flipped={!empty} />
+                </div>
             );
         }
     });
