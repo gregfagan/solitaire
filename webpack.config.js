@@ -8,8 +8,9 @@ module.exports = {
   module: {
     loaders: [
       { test: /\.json$/, loader: 'json-loader' },
-      { test: /\.jsx$/, exclude: /node_modules/, loader: 'jsx-loader?harmony' },
-      { test: /\.styl/, loader: 'style-loader!css-loader!stylus-loader' }
+      { test: /\.jsx|\.js/, exclude: /node_modules/, loader: 'jsx-loader?harmony' },
+      { test: /\.styl/, loader: 'style-loader!css-loader!stylus-loader' },
+      { test: /\.svg$/, loader: 'file?name=./build/img/[name].[ext]'}
     ]
   },
   stylus: {

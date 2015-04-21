@@ -2,6 +2,13 @@ var suits   = ['♣', '♠', '♥', '♦'];
 var suits_c = ['C', 'S', 'H', 'D'];
 var ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
+suits_c.forEach((suit) => {
+  return ranks.forEach((rank) => {
+    var id = rank + suit;
+    require("../../img/svgCards/" + id + ".svg");
+  })
+});
+
 // This value was calculated by taking the measurements found here:
 //      http://www.gripboard.com/index.php?showtopic=41080
 // and the current pixel count of a card width (2.5em/inches/90 pixels)

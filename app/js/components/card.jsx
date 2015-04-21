@@ -10,7 +10,7 @@
   render: function() {
     var suit = Card.suit_c(this.props.card);
     var rank = Card.rank(this.props.card);
-    var file = "img/svgCards/" + rank + suit + ".svg";
+    var file = "img/" + rank + suit + ".svg";
     var id = "card_face_" + Card.toId(this.props.card);
     return (
       <img key={id} src={file} />

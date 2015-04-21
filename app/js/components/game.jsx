@@ -174,7 +174,7 @@ var BoardView = React.createClass({
       }
 
       if (targetPath) {
-        newState.board = this.props.moveCard(
+        newState.board = Game.moveCard(
           this.state.board,
           this.state.draggingPath,
           targetPath
