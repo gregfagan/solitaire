@@ -1,4 +1,2 @@
 // Simple wrapper for an immutable update function
-define(["react-with-addons"], function(React) {
-    return React.addons.update;
-});
+module.exports = require("react/addons").addons.update;

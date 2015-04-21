@@ -1,3 +1,3 @@
-require(["game/game", "components/game"], function(game, view) {
-    view(game, "screen");
-});
+var view = require("./components/game")
+var css = require("../css/stylesheet.styl")
+view("screen");
