@@ -8,12 +8,9 @@
 
  var FaceView = React.createClass({
   render: function() {
-    var suit = Card.suit_c(this.props.card);
-    var rank = Card.rank(this.props.card);
-    var file = "img/" + rank + suit + ".svg";
-    var id = "card_face_" + Card.toId(this.props.card);
+    var id = Card.toId(this.props.card);
     return (
-      <img key={id} src={file} />
+      <img width='100%' height='100%' key={`card_face_${id}`} src={Card.images[id]} />
       );
   }
 });

@@ -1,13 +1,13 @@
+import _ from 'lodash';
+
 var suits   = ['♣', '♠', '♥', '♦'];
 var suits_c = ['C', 'S', 'H', 'D'];
 var ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-
-suits_c.forEach((suit) => {
-  return ranks.forEach((rank) => {
-    var id = rank + suit;
-    require("../../img/svgCards/" + id + ".svg");
-  })
-});
+var images = _(suits)
+  .map((suit, i) => ranks.map(rank => ({ id: rank + suit, image_id: rank + suits_c[i] })))
+  .flatten()
+  .transform((result, card) => result[card.id] = require(`../../img/svgCards/${card.image_id}.svg`), {})
+  .value();
 
 // This value was calculated by taking the measurements found here:
 //      http://www.gripboard.com/index.php?showtopic=41080
@@ -80,6 +80,7 @@ function createDeck() {
 }
 
 module.exports = {
+  images: images,
   isCard: isCard,
   areEqual: areEqual,
   isRed: isRed,

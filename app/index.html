@@ -1,15 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>Solitaire</title>
-
-    <meta charset="utf-8">
-    <!-- Mobile devices use the whole screen and do not zoom -->
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-
-  </head>
-  <body>
-    <div id="screen"></div>
-    <script data-main="/js/main" src="bundle.js"></script>
-  </body>
+    <head>
+        <title>{%=o.htmlWebpackPlugin.options.title%}</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+    </head>
+    <body>
+        <div id="app"/>
+    </body>
+    <script data-main="main" src="{%=o.htmlWebpackPlugin.files.chunks.main.entry%}"></script>
 </html>
