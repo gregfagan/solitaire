@@ -14,43 +14,50 @@
   },
 
   render: function() {
-    var last = _.last(this.props.cards);
-    var initial = _.initial(this.props.cards);
-    var z = this.props.z || 0;
-
-    var path;
-    if (this.props.path) {
-      path = this.props.path.concat(initial.length);
-    }
+    const { 
+      interaction,
+      cards,
+      flipped,
+      cascade,
+      z=0,
+      path,
+      ...other
+    } = this.props;
+    
+    var last = _.last(cards);
+    var initial = _.initial(cards);
 
     if (last) {
       last = <CardView
-      path={path}
-      card={last}
-      flipped={this.props.flipped}
-      cascade={this.props.cascade}
-      interaction={this.props.interaction} />;
+        path={path && path.concat(initial.length)}
+        card={last}
+        flipped={flipped}
+        cascade={cascade}
+        interaction={interaction}
+      />;
     } else {
       last = <div path={path} />;
     }
 
     if (initial.length > 0) {
       initial = <StackView
-      cards={initial}
-      path={this.props.path}
-      flipped={this.props.flipped}
-      cascade={this.props.cascade}
-      interaction={this.props.interaction}
-      z={Card.thickness} />;
+        cards={initial}
+        path={path}
+        flipped={flipped}
+        cascade={cascade}
+        interaction={interaction}
+        z={Card.thickness}
+      />;
     }
 
     return (
       <DragAndDrop
         className="stack"
-        interaction={this.props.interaction}
-        draggable={this.props.interaction.isCardDraggable(path)}
-        dropTarget={this.props.interaction.isCardDropTarget(path)}
+        interaction={interaction}
+        draggable={interaction.isCardDraggable(path)}
+        dropTarget={interaction.isCardDropTarget(path)}
         z={z}
+        {...other}
       >
         {last}{initial}
       </DragAndDrop>
