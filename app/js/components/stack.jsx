@@ -26,10 +26,11 @@
     
     var last = _.last(cards);
     var initial = _.initial(cards);
+    var lastPath = path && path.concat(initial.length);
 
     if (last) {
       last = <CardView
-        path={path && path.concat(initial.length)}
+        path={lastPath}
         card={last}
         flipped={flipped}
         cascade={cascade}
@@ -54,9 +55,10 @@
       <DragAndDrop
         className="stack"
         interaction={interaction}
-        draggable={interaction.isCardDraggable(path)}
-        dropTarget={interaction.isCardDropTarget(path)}
+        draggable={interaction.isCardDraggable(lastPath)}
+        dropTarget={interaction.isCardDropTarget(lastPath)}
         z={z}
+        path={path}
         {...other}
       >
         {last}{initial}
