@@ -3,7 +3,7 @@ var update = require("../update");
 var Card = require("./card");
 
 function deal(deck) {
-  deck = deck.slice(0);
+  deck = deck.slice(0); // make a copy
 
   var i,j;
   var column;
