@@ -9,22 +9,25 @@ var ColumnView = React.createClass({
   render: function () {
     return (
       <div className="card column">
-      <CardView
-      path={this.props.path.concat("uncovered")}
-      slot={true}
-      cascade="none" />
-      <StackView
-      path={this.props.path.concat("covered")}
-      cards={this.props.covered}
-      interaction={this.props.interaction}
-      flipped={true}
-      cascade="down" />
-      <StackView
-      path={this.props.path.concat("uncovered")}
-      cards={this.props.uncovered}
-      interaction={this.props.interaction}
-      cascade="down"
-      z={(this.props.covered.length) * Card.thickness} />
+        <CardView
+          path={this.props.path.concat("uncovered")}
+          slot={true}
+          cascade="none"
+        />
+        <StackView
+          path={this.props.path.concat("covered")}
+          cards={this.props.covered}
+          interaction={this.props.interaction}
+          flipped={true}
+          cascade="down"
+        />
+        <StackView
+          path={this.props.path.concat("uncovered")}
+          cards={this.props.uncovered}
+          interaction={this.props.interaction}
+          cascade="down"
+          z={(this.props.covered.length) * Card.thickness}
+        />
       </div>
       );
   }
@@ -58,18 +61,20 @@ var DrawView = React.createClass({
     var empty = this.props.cards.length <= 0;
     return (
       <div id="drawPile" onClick={this.props.interaction.draw}>
-      <CardView
-      path={this.props.path.concat("uncovered")}
-      slot={true}
-      cascade="none" />
-      <StackView
-      className="card"
-      path={this.props.path.concat("draw")}
-      interaction={this.props.interaction}
-      cards={this.props.cards}
-      flipped={!empty} />
+        <CardView
+          path={this.props.path.concat("uncovered")}
+          slot={true}
+          cascade="none"
+        />
+        <StackView
+          className="card"
+          path={this.props.path.concat("draw")}
+          interaction={this.props.interaction}
+          cards={this.props.cards}
+          flipped={!empty}
+        />
       </div>
-      );
+    );
   }
 });
 
@@ -80,11 +85,12 @@ var WasteView = React.createClass({
     else
       return (
         <StackView
-        id="wastePile"
-        path={this.props.path.concat("waste")}
-        cards={this.props.cards}
-        interaction={this.props.interaction} />
-        );
+          id="wastePile"
+          path={this.props.path.concat("waste")}
+          cards={this.props.cards}
+          interaction={this.props.interaction}
+        />
+      );
   }
 });
 
@@ -178,7 +184,7 @@ var BoardView = React.createClass({
           this.state.board,
           this.state.draggingPath,
           targetPath
-          );
+        );
       }
 
       this.setState(newState);
