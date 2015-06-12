@@ -1,25 +1,24 @@
-/**
-* @jsx React.DOM
-*/
+import React from 'react';
+import transform from '../util/transform';
+import classnames from 'classnames';
 
-var React = require("react/addons")
-var transform = require("../util/transform")
+const dragHeight = 20;
 
-var dragHeight = 20;
+export default class DragAndDrop extends React.Component {
+  constructor() {
+    super();
+    this.state = { dragging: false };
+    this.boundOnGlobalMouseMove = this.onGlobalMouseMove.bind(this);
+    this.boundOnGlobalMouseUp = this.onGlobalMouseUp.bind(this);
+  }
 
-var DragAndDrop = React.createClass({
-  getDefaultProps: function() {
-    return { interaction: {} };
-  },
+  onMouseDown(e) {
+    const { draggable, interaction, children } = this.props;
+    const { dragging } = this.state;
 
-  getInitialState: function() {
-    return { dragging: false };
-  },
-
-  onMouseDown: function(e) {
-    if (this.props.draggable && !this.state.dragging) {
-      document.addEventListener('mousemove', this.onGlobalMouseMove);
-      document.addEventListener('mouseup', this.onGlobalMouseUp);
+    if (draggable && !dragging) {
+      document.addEventListener('mousemove', this.boundOnGlobalMouseMove);
+      document.addEventListener('mouseup', this.boundOnGlobalMouseUp);
 
       this.setState({
         dragging: true,
@@ -29,36 +28,41 @@ var DragAndDrop = React.createClass({
       e.preventDefault();
       e.stopPropagation();
 
-      if (this.props.interaction.onDragBegin)
-        this.props.interaction.onDragBegin(this.props.children);
+      if (interaction.onDragBegin)
+        interaction.onDragBegin(children);
     }
-  },
+  }
 
-  onMouseUp: function(e) {
-    if(this.props.dropTarget && this.props.interaction.onDragEnd) {
-      this.props.interaction.onDragEnd(this.props.children);
+  onMouseUp(e) {
+    const { dropTarget, interaction, children } = this.props;
+
+    if(dropTarget && interaction.onDragEnd) {
+      interaction.onDragEnd(children);
     }
-  },
+  }
 
-  onGlobalMouseUp: function(e) {
-    if (this.state.dragging) {
-      document.removeEventListener('mouseup', this.onGlobalMouseUp);
-      document.removeEventListener('mousemove', this.onGlobalMouseMove);
+  onGlobalMouseUp(e) {
+    const { interaction, children } = this.props;
+    const { dragging } = this.state;
 
-      if (this.isMounted()) {
+    if (dragging) {
+      document.removeEventListener('mousemove', this.boundOnGlobalMouseMove);
+      document.removeEventListener('mouseup', this.boundOnGlobalMouseUp);
+
+      if (React.findDOMNode(this)) {
         this.setState({
           dragging: false,
           offset: { x:0, y:0 }
         });
       }
 
-      if(this.props.interaction.onDragEnd) {
-        this.props.interaction.onDragEnd(this.props.children);
+      if(interaction.onDragEnd) {
+        interaction.onDragEnd(children);
       }
     }
-  },
+  }
 
-  onGlobalMouseMove: function(e) {
+  onGlobalMouseMove(e) {
     if (this.state.dragging) {
       this.setState({
         offset: {
@@ -67,32 +71,44 @@ var DragAndDrop = React.createClass({
         }
       })
     }
-  },
+  }
 
-  render: function() {
-    var t =  this.state.dragging ?
-      transform(this.state.offset.x, this.state.offset.y, dragHeight) :
-      transform(0, 0, this.props.z);
+  render() {
+    const { 
+      style,
+      className,
+      z,
+      draggable,
+      dropTarget,
+      ...other
+    } = this.props;
 
-    var classes = React.addons.classSet({
-      'draggable': this.props.draggable,
-      'dragging': this.state.dragging,
-      'dropTarget': this.props.dropTarget,
-      'card': this.props.dropTarget
-    })
+    const { 
+      dragging, 
+      offset 
+    } = this.state;
+    
+    const t =  dragging ?
+      transform(offset.x, offset.y, dragHeight) :
+      transform(0, 0, z);
+
+    const classes = classnames({
+      'draggable': draggable,
+      'dragging': dragging,
+      'dropTarget': dropTarget,
+      'card': dropTarget
+    }, className)
 
     return (
       <div
         className={classes}
-        style={t}
-        onMouseDown={this.onMouseDown}
-        onMouseUp={this.onMouseUp}
-        {...this.props}
-      >
-        { this.props.children }
-      </div>
+        style={Object.assign({}, t, style)}
+        onMouseDown={this.onMouseDown.bind(this)}
+        onMouseUp={this.onMouseUp.bind(this)}
+        {...other}
+      />
     );
   }
-});
+};
 
-module.exports = DragAndDrop;
+DragAndDrop.defaultProps = { interaction: {} };
