@@ -7,9 +7,13 @@ const dragHeight = 20;
 export default class DragAndDrop extends React.Component {
   constructor() {
     super();
+    
+    this.onMouseDown = this.onMouseDown.bind(this);
+    this.onMouseUp = this.onMouseUp.bind(this); 
+    this.onGlobalMouseMove = this.onGlobalMouseMove.bind(this);
+    this.onGlobalMouseUp = this.onGlobalMouseUp.bind(this);
+
     this.state = { dragging: false };
-    this.boundOnGlobalMouseMove = this.onGlobalMouseMove.bind(this);
-    this.boundOnGlobalMouseUp = this.onGlobalMouseUp.bind(this);
   }
 
   onMouseDown(e) {
@@ -17,8 +21,8 @@ export default class DragAndDrop extends React.Component {
     const { dragging } = this.state;
 
     if (draggable && !dragging) {
-      document.addEventListener('mousemove', this.boundOnGlobalMouseMove);
-      document.addEventListener('mouseup', this.boundOnGlobalMouseUp);
+      document.addEventListener('mousemove', this.onGlobalMouseMove);
+      document.addEventListener('mouseup', this.onGlobalMouseUp);
 
       this.setState({
         dragging: true,
@@ -46,8 +50,8 @@ export default class DragAndDrop extends React.Component {
     const { dragging } = this.state;
 
     if (dragging) {
-      document.removeEventListener('mousemove', this.boundOnGlobalMouseMove);
-      document.removeEventListener('mouseup', this.boundOnGlobalMouseUp);
+      document.removeEventListener('mousemove', this.onGlobalMouseMove);
+      document.removeEventListener('mouseup', this.onGlobalMouseUp);
 
       if (isMounted(this)) {
         this.setState({
@@ -103,8 +107,8 @@ export default class DragAndDrop extends React.Component {
       <div
         className={classes}
         style={Object.assign({}, t, style)}
-        onMouseDown={this.onMouseDown.bind(this)}
-        onMouseUp={this.onMouseUp.bind(this)}
+        onMouseDown={this.onMouseDown}
+        onMouseUp={this.onMouseUp}
         {...other}
       />
     );
