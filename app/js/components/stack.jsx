@@ -37,7 +37,7 @@
         interaction={interaction}
       />;
     } else {
-      last = <div path={path} />;
+      last = <div path={lastPath} />;
     }
 
     if (initial.length > 0) {
@@ -58,7 +58,6 @@
         draggable={interaction.isCardDraggable(lastPath)}
         dropTarget={interaction.isCardDropTarget(lastPath)}
         z={z}
-        path={path}
         {...other}
       >
         {last}{initial}
