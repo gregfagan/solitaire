@@ -1,13 +1,28 @@
-var _ = require('lodash');
-var path = require('path');
-var webpack = require('webpack');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var stylus_plugin = require('nib');
+import _ from 'lodash';
+import path from 'path';
+import webpack from 'webpack';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import stylus_plugin from 'nib';
+import os from 'os';
 
-module.exports = {
+const netInterfaces = os.networkInterfaces();
+const addresses = _(netInterfaces)
+  .map(value => value)
+  .flatten()
+  .filter(netInterface => (netInterface.family === 'IPv4' && !netInterface.internal))
+  .map(netInterface => netInterface.address)
+  .value();
+
+const devServerConfig = {
+  hostname: _.first(addresses),
+  port: 8080,
+};
+
+const config = {
+  ...devServerConfig,
   devtool: 'eval',
   entry: [
-    'webpack-dev-server/client?http://localhost:8080',
+    `webpack-dev-server/client?http://${devServerConfig.hostname}:${devServerConfig.port}`,
     'webpack/hot/dev-server',
     './app/js/main.js',
   ],
@@ -45,4 +60,6 @@ module.exports = {
     // this plugin is not compatible with the source images
     plugins: [ { convertTransform: false } ]
   }
-}
+};
+
+export default config;
