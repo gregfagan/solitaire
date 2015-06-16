@@ -1,5 +1,5 @@
 var _ = require("lodash");
-var React = require("react/addons");
+var React = require("react");
 var Card = require("../game/card");
 var StackView = require("./stack")
 var CardView = require("./card");
@@ -99,17 +99,19 @@ var FoundationView = React.createClass({
     var that = this;
     var p = this.props.path.concat("foundation");
     var stacks = this.props.cards.map(function(stack, index) {
-      var path = p.concat(index);
+      let path = p.concat(index);
       return (
         <div key={index} className="card">
-        <CardView
-        path={path}
-        slot={true}
-        cascade="none" />
-        <StackView
-        path={path}
-        cards={stack}
-        interaction={that.props.interaction} />
+          <CardView
+            path={path}
+            slot={true}
+            cascade="none"
+          />
+          <StackView
+            path={path}
+            cards={stack}
+            interaction={that.props.interaction}
+          />
         </div>
         );
     });
@@ -144,12 +146,12 @@ var BoardView = React.createClass({
       },
 
       isCardDropTarget: function(path) {
-        if (!path)
-          return false;
-        if (draggingPath && !_.isEqual(draggingPath, path))
-          return this.canReceive(draggingPath, path);
+        let result = false;
+        
+        if (path && draggingPath && !_.isEqual(draggingPath, path))
+          result = this.canReceive(draggingPath, path);
 
-        return false;
+        return result;
       },
 
       canMove: this.bindCapability(Game.canMoveCard),
