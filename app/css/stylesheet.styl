@@ -35,7 +35,7 @@ body
 
 // transform-style is not inherited by children. To maintain z space throughtout
 // all elements on screen, give each the preserve-3d style.
-#screen
+#app
 #board
 #drawPile
 #wastePile
@@ -44,7 +44,7 @@ body
 div
     transform-style preserve-3d
 
-#screen
+#app
     width 100%
     height 100%
     position fixed
@@ -53,8 +53,8 @@ div
 #board
     font-size 36px
     width 7 * 2.5em + 7 * 0.25em
-    position absolute
-    margin 0.25em
+    position relative
+    margin 0.25em auto
     transform rotateX(5deg) translateZ(-1em)
 
 #drawPile
