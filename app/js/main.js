@@ -1,4 +1,7 @@
-require('babel/polyfill');
-var view = require("./components/game")
-var css = require("../css/stylesheet.styl")
-view("app");
+import 'babel/polyfill';
+import '../css/stylesheet.styl';
+import React from 'react';
+import Board from './components/board';
+
+React.initializeTouchEvents(true);
+React.render(<Board/>, document.getElementById('app'));

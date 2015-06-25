@@ -1,26 +1,27 @@
-/**
- * @jsx React.DOM
- */
+import _ from "lodash";
+import React from "react/addons";
+import { thickness } from "game/card";
+import DragAndDrop from "components/draganddrop";
+import Card from "components/card"
+import transform from '../util/transform';
 
- var _ = require("lodash")
- var React = require("react/addons")
- var Card = require("game/card")
- var DragAndDrop = require("components/draganddrop")
- var CardView = require("components/card")
+ export default class Stack extends React.Component {
+  static defaultProps = {
+    cascade: "none",
+    z: 0,
+  }
 
- var StackView = React.createClass({
-  getDefaultProps: function() {
-    return { cascade: "none" };
-  },
-
-  render: function() {
+  render() {
     const { 
       interaction,
       cards,
       flipped,
       cascade,
-      z=0,
+      z,
       path,
+      connectDragSource,
+      connectDropTarget,
+      isDragging,
       ...other
     } = this.props;
     
@@ -29,7 +30,7 @@
     var lastPath = path && path.concat(initial.length);
 
     if (last) {
-      last = <CardView
+      last = <Card
         path={lastPath}
         card={last}
         flipped={flipped}
@@ -41,13 +42,13 @@
     }
 
     if (initial.length > 0) {
-      initial = <StackView
+      initial = <Stack
         cards={initial}
         path={path}
         flipped={flipped}
         cascade={cascade}
         interaction={interaction}
-        z={Card.thickness}
+        z={thickness}
       />;
     }
 
@@ -64,6 +65,4 @@
       </DragAndDrop>
     );
   }
-});
-
-module.exports = StackView;
+};

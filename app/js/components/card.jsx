@@ -1,20 +1,20 @@
 import _ from "lodash";
 import React from "react";
-import Card from "game/card";
+import { toId, images } from "game/card";
 import classnames from 'classnames';
 
 class FaceView extends React.Component {
   render() {
-    const id = Card.toId(this.props.card);
+    const id = toId(this.props.card);
     return (
-      <img width='100%' height='100%' key={`card_face_${id}`} src={Card.images[id]} />
+      <img width='100%' height='100%' key={`card_face_${id}`} src={images[id]} />
     );
   }
 };
  
  export default class CardView extends React.Component {
   render() {
-    const id = this.props.card ? "card_" + Card.toId(this.props.card) : "";
+    const id = this.props.card ? "card_" + toId(this.props.card) : "";
 
     const classes = classnames({
       'card': true,

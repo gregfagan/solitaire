@@ -35,7 +35,7 @@ const config = {
     loaders: [
       { test: /\.styl/, loader: 'style!css!stylus' },
       { test: /\.json$/, loader: 'json-loader' },
-      { test: /\.jsx?$/, exclude: /node_modules/, loaders: ['react-hot', 'babel?stage=1'] },
+      { test: /\.jsx?$/, exclude: /node_modules/, loaders: ['react-hot', 'babel?stage=0'] },
       { test: /svgCards\/.+\.svg/, loaders: ['url-loader?limit=16384', 'svgo-loader?useConfig=svgo', '../../../card-image-loader'] },
       { test: /\.(png|jpg)$/, loader: 'url-loader?limit=8192' }
     ]

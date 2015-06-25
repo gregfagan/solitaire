@@ -1,9 +1,9 @@
 import _ from 'lodash';
 
-var suits   = ['♣', '♠', '♥', '♦'];
-var suits_c = ['C', 'S', 'H', 'D'];
-var ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-var images = _(suits)
+export const suits   = ['♣', '♠', '♥', '♦'];
+export const suits_c = ['C', 'S', 'H', 'D'];
+export const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+export const images = _(suits)
   .map((suit, i) => ranks.map(rank => ({ id: rank + suit, image_id: rank + suits_c[i] })))
   .flatten()
   .transform((result, card) => result[card.id] = require(`../../img/svgCards/${card.image_id}.svg`), {})
@@ -15,37 +15,37 @@ var images = _(suits)
 // to find a ratio between inches and pixels.
 // TODO: This should be calculated at runtime so that it can change with
 // card size (which should scale with viewport)
-var thickness = 0.430615385;
+export const thickness = 0.430615385;
 
-function isCard(card) {
+export function isCard(card) {
   return card.suit && card.rank;
 }
 
-function areEqual(a, b) {
+export function areEqual(a, b) {
   return a.suit === b.suit && a.rank === b.rank;
 }
 
-function isRed(card) {
+export function isRed(card) {
   return card.suit === '♥' || card.suit === '♦';
 }
 
-function toId(card) {
+export function toId(card) {
   return card.rank + card.suit;
 }
 
-function suit(card) {
+export function suit(card) {
   return card.suit;
 }
 
-function suit_c(card) {
+export function suit_c(card) {
   return suits_c[suits.indexOf(card.suit)];
 }
 
-function rank(card) {
+export function rank(card) {
   return card.rank;
 }
 
-function doesTableauStack(fromCard, toCard) {
+export function doesTableauStack(fromCard, toCard) {
   if (!fromCard || !toCard) return false;
 
   var fromRankIdx = ranks.indexOf(rank(fromCard));
@@ -56,7 +56,7 @@ function doesTableauStack(fromCard, toCard) {
   return isPreviousRank && isOppositeColor;
 }
 
-function doesFoundationStack(fromCard, toCard) {
+export function doesFoundationStack(fromCard, toCard) {
   if (!fromCard || !toCard) return false;
 
   var fromRankIdx = ranks.indexOf(rank(fromCard));
@@ -67,7 +67,7 @@ function doesFoundationStack(fromCard, toCard) {
   return isNextRank && isSameSuit;
 }
 
-function createDeck() {
+export function createDeck() {
   var deck = [];
 
   suits.forEach(function (suit) {
@@ -78,18 +78,3 @@ function createDeck() {
 
   return deck;
 }
-
-module.exports = {
-  images: images,
-  isCard: isCard,
-  areEqual: areEqual,
-  isRed: isRed,
-  toId: toId,
-  suit: suit,
-  suit_c: suit_c,
-  rank: rank,
-  thickness: thickness,
-  doesTableauStack: doesTableauStack,
-  doesFoundationStack: doesFoundationStack,
-  createDeck: createDeck
-};
