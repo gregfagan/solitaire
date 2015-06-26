@@ -6,7 +6,12 @@ import Foundation from './foundation';
 import Tableau from './tableau';
 import Game from '../game/game';
 import GameCard from '../game/card';
+import CardDragLayer from './draglayer';
 
+import { DragDropContext } from 'react-dnd';
+import HTML5Backend from 'react-dnd/modules/backends/HTML5';
+
+@DragDropContext(HTML5Backend)
 export default class Board extends React.Component {
   constructor() {
     super();
@@ -52,6 +57,7 @@ export default class Board extends React.Component {
         <Waste path={[]} cards={board.waste} interaction={interaction} />
         <Foundation path={[]} stacks={board.foundation} interaction={interaction} />
         <Tableau path={[]} columns={board.tableau} interaction={interaction} />
+        <CardDragLayer/>
       </div>
     );
   }
