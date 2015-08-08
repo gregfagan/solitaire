@@ -4,10 +4,10 @@ import Column from './column';
 
 export default class Tableau extends React.Component {
   render() {
-    const { columns } = this.props;
+    const { columns, ...other } = this.props;
     
     return (
-      <View direction='row'>
+      <View direction='row' {...other}>
       {
         columns.map((column, i) =>
           <Column

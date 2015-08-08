@@ -30,13 +30,10 @@ export default class Board extends React.Component {
         <View alignSelf='center' style={styles.board}>
           <View direction='row'>
             <Draw cards={board.draw} drawCard={this.bindGameEvent(Game.drawCard)} />
-            <View style={{ width: '0.25em' }}/>
             <Waste cards={board.waste}/>
-            <View grow={1}/>
-            <Foundation stacks={board.foundation}/>
+            <Foundation grow={1} justifyContent='end' stacks={board.foundation}/>
           </View>
-          <View style={{ height: '1em' }}/>
-          <Tableau columns={board.tableau}/>
+          <Tableau columns={board.tableau} style={{ marginTop: '1em'}}/>
           <CardDragLayer/>
         </View>
       </View>
