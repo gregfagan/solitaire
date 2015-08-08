@@ -15,7 +15,7 @@ export const images = _(suits)
 // to find a ratio between inches and pixels.
 // TODO: This should be calculated at runtime so that it can change with
 // card size (which should scale with viewport)
-export const thickness = 0.430615385;
+export const thickness = '0.430615385px';
 
 export function isCard(card) {
   return card.suit && card.rank;

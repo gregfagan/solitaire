@@ -1,7 +1,19 @@
 import 'babel/polyfill';
-import '../css/stylesheet.styl';
 import React from 'react';
+import View from './components/view';
 import Board from './components/board';
+import { Style } from 'radium';
+
+const app = (
+  <View>
+    <Style rules={{
+      'body': {
+        backgroundColor: '#0F2A42'
+      }
+    }}/>
+    <Board/>
+  </View>
+);
 
 React.initializeTouchEvents(true);
-React.render(<Board/>, document.getElementById('app'));
+React.render(app, document.getElementById('app'));

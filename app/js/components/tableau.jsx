@@ -1,25 +1,22 @@
 import React from 'react';
+import View from './view';
 import Column from './column';
 
 export default class Tableau extends React.Component {
   render() {
-    const { columns, path, interaction } = this.props;
-    const p = path.concat("tableau");
+    const { columns } = this.props;
     
     return (
-      <div id="tableau">
+      <View direction='row'>
       {
         columns.map((column, i) =>
           <Column
             key={i}
-            path={p.concat(i)}
-            covered={column.covered}
-            uncovered={column.uncovered}
-            interaction={interaction}
+            {...column}
           />
         )
       }
-      </div>
+      </View>
     );
   }
 };

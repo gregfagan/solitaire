@@ -1,34 +1,15 @@
 import React from 'react';
-import Stack from './stack';
-import Card from './card';
+import View from './view';
+import { Stack } from './card';
 
 export default class Foundation extends React.Component {
   render() {
-    const { stacks, path, interaction } = this.props;
-    const p = path.concat("foundation");
+    const { stacks } = this.props;
 
     return (
-      <div id="foundation">
-      {
-        stacks.map((stack, i) => {
-          const stackPath = p.concat(i);
-          return (
-            <div key={i} className="card">
-              <Card
-                path={stackPath}
-                slot={true}
-                cascade="none"
-              />
-              <Stack
-                path={stackPath}
-                cards={stack}
-                interaction={interaction}
-              />
-            </div>
-          );
-        })
-      }
-      </div>
+      <View direction='row'>
+        { stacks.map((stack, i) => <Stack key={i} cards={stack}/>) }
+      </View>
     );
   }
 };
