@@ -1,7 +1,4 @@
-import _ from 'lodash';
 import React from 'react';
-
-import Game from '../game/game';
 
 import View from './view';
 import Draw from './draw';
@@ -15,41 +12,24 @@ import CardDragLayer from './draglayer';
 
 @DragDropContext(HTML5Backend)
 export default class Board extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      board: Game.createBoard(),
-    };
-  }
-
   render() {
-    var board = this.state.board;
+    const { draw, waste, foundation, tableau } = this.props;
     
     return (
       <View style={{ perspective: 400 }}>
         <View alignSelf='center' style={styles.board}>
           <View direction='row'>
-            <Draw cards={board.draw} drawCard={this.bindGameEvent(Game.drawCard)} />
-            <Waste cards={board.waste}/>
-            <Foundation grow={1} justifyContent='end' stacks={board.foundation}/>
+            <Draw cards={draw} />
+            <Waste cards={waste}/>
+            <View grow={1}/>
+            <Foundation stacks={foundation}/>
           </View>
-          <Tableau columns={board.tableau} style={{ marginTop: '1em'}}/>
+          <View style={{ height: '1em' }}/>
+          <Tableau columns={tableau}/>
           <CardDragLayer/>
         </View>
       </View>
     );
-  }
-
-  bindGameEvent(gameEvent) {
-    function wrapResult(newBoard) {
-      return { board: newBoard };
-    };
-
-    return _.compose(
-      this.setState,
-      wrapResult,
-      _.partial(gameEvent, this.state.board)
-      ).bind(this);
   }
 };
 

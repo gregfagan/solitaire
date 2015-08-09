@@ -5,14 +5,14 @@ import { toId, images, thickness } from '../game/card';
  
 export default class Card extends React.Component {
   render() {
-    const { card, flipped=false } = this.props;
+    const { id, flipped=false } = this.props;
 
     return (
       <View style={styles.card}>
         { 
           flipped ? 
             <View style={styles.back} /> :
-            <img style={styles.face} src={images[toId(card)]} />
+            <img style={styles.face} src={images[id]} />
         }
         
       </View>
@@ -26,7 +26,7 @@ export function renderCards(cards, flipped) {
   //    ...I accidentally reversed my Stack logic when rewriting it
   //    and I think first -> last stacking is better than last -> first
   return cards.reverse().map((child, index) => (
-    <Card key={index} card={child} flipped={flipped}/>
+    <Card key={index} id={child} flipped={flipped}/>
   ))
 }
 

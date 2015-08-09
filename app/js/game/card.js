@@ -67,8 +67,21 @@ export function doesFoundationStack(fromCard, toCard) {
   return isNextRank && isSameSuit;
 }
 
+export const deck = suits.map(
+  suit => ranks.map(
+    rank => ({
+      suit, rank, id: toId({ rank, suit })
+    })
+  ))
+  .reduce((deck, suitOfCards) => [...deck, ...suitOfCards]) // flatten
+  .reduce((deck, card) => { //index
+    const { id, ...suitAndRank } = card;
+    deck[id] = suitAndRank;
+    return deck;
+  }, {});
+
 export function createDeck() {
-  var deck = [];
+  const deck = [];
 
   suits.forEach(function (suit) {
     ranks.forEach(function (rank) {
