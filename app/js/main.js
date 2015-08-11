@@ -5,20 +5,22 @@ import { Style } from 'radium';
 
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
-import { default as game } from './game/klondike';
+import klondike from './game/reducers';
 import Klondike from './components/klondike';
 
-const store = createStore(game);
+const store = createStore(klondike);
+
+const styles = {
+  'body': {
+    backgroundColor: '#0F2A42'
+  }
+}
 
 const app = (
   <View>
-    <Style rules={{
-      'body': {
-        backgroundColor: '#0F2A42'
-      }
-    }}/>
+    <Style rules={styles}/>
     <Provider store={store}>
-      { () => <Klondike/> }
+      { () => <Klondike /> }
     </Provider>
   </View>
 );

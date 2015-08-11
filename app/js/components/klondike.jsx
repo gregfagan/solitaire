@@ -1,30 +1,39 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { actions } from '../game/klondike';
+import actions from '../game/actions';
 
 import View from './view';
+import Menu from './menu';
 import Board from './board';
 
-@connect(state => state)
+const drawOptions = {
+  'Draw One': 1,
+  'Draw Three': 3,
+};
+
+@connect(state => state, dispatch => ({
+  actions: {
+    shuffleAndDeal: () => dispatch(actions.shuffleAndDeal()),
+    drawCard: () => dispatch(actions.draw()),
+    setDrawCount: (option) => dispatch(actions.setDrawCount(drawOptions[option])),
+  }
+}))
 export default class Klondike extends Component {
+  componentDidMount() {
+    this.props.actions.shuffleAndDeal();
+  }
+
   render() {
-    const { board, dispatch } = this.props;
+    const { board, options, actions } = this.props;
 
     return (
       <View>
-        <Menu onShuffleAndDeal={() => dispatch(actions.shuffleAndDeal())}/>
-        <Board {...board}/>;
-      </View>
-    );
-  }
-}
-
-class Menu extends Component {
-  render() {
-    const { onShuffleAndDeal } = this.props;
-    return (
-      <View direction='row'>
-        <button onClick={onShuffleAndDeal}>New Game</button>
+        <Menu
+          shuffleAndDeal={actions.shuffleAndDeal}
+          drawOptions={Object.keys(drawOptions)}
+          currentDrawOption={options.drawCount}
+          changeDrawOption={actions.setDrawCount} />
+        <Board drawCard={actions.drawCard} {...board}/>;
       </View>
     );
   }

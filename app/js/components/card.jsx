@@ -21,11 +21,7 @@ export default class Card extends React.Component {
 };
 
 export function renderCards(cards, flipped) {
-  // TODO: reverse game logic so reverse() not needed here
-  //
-  //    ...I accidentally reversed my Stack logic when rewriting it
-  //    and I think first -> last stacking is better than last -> first
-  return cards.reverse().map((child, index) => (
+  return cards.map((child, index) => (
     <Card key={index} id={child} flipped={flipped}/>
   ))
 }
