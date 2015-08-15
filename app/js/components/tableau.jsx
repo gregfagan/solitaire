@@ -7,12 +7,13 @@ export default class Tableau extends React.Component {
     const { columns, ...other } = this.props;
     
     return (
-      <View direction='row' {...other}>
+      <View direction='row'>
       {
         columns.map((column, i) =>
           <Column
             key={i}
             {...column}
+            {...other}
           />
         )
       }

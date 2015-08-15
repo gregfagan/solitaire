@@ -3,7 +3,7 @@ import range from 'lodash/utility/range';
 import cloneDeep from 'lodash/lang/cloneDeep';
 
 import { deck } from './card';
-import { SHUFFLE_AND_DEAL, DRAW, SET_DRAW_COUNT } from './actions';
+import { SHUFFLE_AND_DEAL, DRAW, SET_DRAW_COUNT, MOVE } from './actions';
 
 const initialState = {
   options: {
@@ -27,6 +27,9 @@ export default function klondike(state=initialState, action) {
       return { ...state, board: draw(state.board, state.options.drawCount) };
     case SET_DRAW_COUNT:
       return { ...state, options: { ...state.options, drawCount: action.payload }};
+    case MOVE:
+      const { from, to } = action.payload;
+      return { ...state, board: move(state.board, from, to) };
     
     default:
       return state;
@@ -66,4 +69,9 @@ function draw(board, count=1) {
     draw: source.slice(0, -count),
     waste: destination.concat(moved),
   }
+}
+
+function move(board, from, to) {
+  console.log(`moving ${from} to ${to}`);
+  return board;
 }

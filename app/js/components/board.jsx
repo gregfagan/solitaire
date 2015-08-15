@@ -13,19 +13,19 @@ import CardDragLayer from './draglayer';
 @DragDropContext(HTML5Backend)
 export default class Board extends React.Component {
   render() {
-    const { draw, waste, foundation, tableau, drawCard } = this.props;
+    const { draw, waste, foundation, tableau, actions } = this.props;
     
     return (
       <View style={{ perspective: 400 }}>
         <View alignSelf='center' style={styles.board}>
           <View direction='row'>
-            <Draw cards={draw} drawCard={drawCard}/>
-            <Waste cards={waste}/>
+            <Draw cards={draw} drawCard={actions.drawCard}/>
+            <Waste cards={waste} moveCard={actions.moveCard}/>
             <View grow={1}/>
-            <Foundation stacks={foundation}/>
+            <Foundation stacks={foundation} moveCard={actions.moveCard}/>
           </View>
           <View style={{ height: '1em' }}/>
-          <Tableau columns={tableau}/>
+          <Tableau columns={tableau} moveCard={actions.moveCard}/>
           <CardDragLayer/>
         </View>
       </View>
@@ -35,9 +35,8 @@ export default class Board extends React.Component {
 
 const styles = {
   board: {
-    marginTop: 100,
     fontSize: 36,
-    margin: 'auto',
+    margin: '1em auto',
     transform: 'rotateX(5deg) translateZ(-1em)',
   }
 }

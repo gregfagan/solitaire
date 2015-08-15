@@ -1,26 +1,33 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import findKey from 'lodash/object/findKey';
+
 import actions from '../game/actions';
 
 import View from './view';
 import Menu from './menu';
 import Board from './board';
 
-const drawOptions = {
+const drawCountOptions = {
   'Draw One': 1,
   'Draw Three': 3,
 };
 
 @connect(state => state, dispatch => ({
   actions: {
-    shuffleAndDeal: () => dispatch(actions.shuffleAndDeal()),
-    drawCard: () => dispatch(actions.draw()),
-    setDrawCount: (option) => dispatch(actions.setDrawCount(drawOptions[option])),
+    interface: {
+      shuffleAndDeal: () => dispatch(actions.shuffleAndDeal()),
+      setDrawCount: option => dispatch(actions.setDrawCount(drawCountOptions[option])),
+    },
+    game: {
+      drawCard: () => dispatch(actions.draw()),
+      moveCard: (from, to) => dispatch(actions.move(from, to)),
+    },
   }
 }))
 export default class Klondike extends Component {
   componentDidMount() {
-    this.props.actions.shuffleAndDeal();
+    this.props.actions.interface.shuffleAndDeal();
   }
 
   render() {
@@ -29,11 +36,10 @@ export default class Klondike extends Component {
     return (
       <View>
         <Menu
-          shuffleAndDeal={actions.shuffleAndDeal}
-          drawOptions={Object.keys(drawOptions)}
-          currentDrawOption={options.drawCount}
-          changeDrawOption={actions.setDrawCount} />
-        <Board drawCard={actions.drawCard} {...board}/>;
+          actions={actions.interface}
+          drawOptions={Object.keys(drawCountOptions)}
+          currentDrawCountOption={findKey(drawCountOptions, option => option === options.drawCount)} />
+        <Board {...board} actions={actions.game} />
       </View>
     );
   }

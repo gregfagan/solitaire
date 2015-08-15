@@ -34,7 +34,7 @@ export default class CardDragLayer extends React.Component {
       <div style={layerStyles}>
       { isDragging &&
         <div style={getItemStyles(this.props, this.state)}>
-          <Card card={item.card}/>
+          <Card id={item.id}/>
         </div>
       }
       </div>
@@ -43,6 +43,7 @@ export default class CardDragLayer extends React.Component {
 }
 
 const layerStyles = {
+  transformStyle: 'preserve-3d',
   position: 'fixed',
   pointerEvents: 'none',
   zIndex: 100,

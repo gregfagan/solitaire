@@ -4,12 +4,12 @@ import { Cascade, renderCards } from './card';
 
 export default class Column extends React.Component {
   render() {
-    const { covered, uncovered } = this.props;
+    const { covered, uncovered, moveCard, ...other } = this.props;
 
     return (
-      <Cascade>
-        { renderCards(covered, true) }
-        { renderCards(uncovered, false) }
+      <Cascade {...other}>
+        { renderCards(covered, true, false) }
+        { renderCards(uncovered, false, true, moveCard) }
       </Cascade>
     );
   }
