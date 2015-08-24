@@ -1,19 +1,12 @@
 import React from 'react';
+import { firstAndRest } from 'util/react-children';
 
 export default class Stack extends React.Component {
   render() {
     const { container:Container, depth=0, children, ...other } = this.props;
 
-    let first;
-    const rest = [];
+    const [ first, rest ] = firstAndRest(children);
 
-    React.Children.forEach(children, (child, index) => {
-      if (index === 0) {
-        first = child;
-      } else {
-        rest.push(child);
-      }
-    });
 
     return (
       <Container depth={depth} {...other}>
