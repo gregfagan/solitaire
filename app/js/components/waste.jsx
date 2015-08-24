@@ -1,5 +1,5 @@
 import React from 'react';
-import { Stack } from './card';
+import { Stack } from './card-stacks';
 
 export default class Waste extends React.Component {
   render() {

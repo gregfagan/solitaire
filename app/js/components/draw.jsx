@@ -1,5 +1,5 @@
 import React from 'react';
-import { Stack } from './card';
+import { Stack } from './card-stacks';
 
 export default class Draw extends React.Component {
   constructor() {
@@ -18,7 +18,7 @@ export default class Draw extends React.Component {
     const { cards } = this.props;
 
     return (
-      <Stack onClick={this.handleClick} flipped={true} cards={cards} style={style}/>
+      <Stack onClick={this.handleClick} faceUp={false} cards={cards} style={style} />
     );
   }
 };

@@ -1,14 +1,14 @@
 import React from 'react';
 import View from './view';
-import { Stack } from './card';
+import { Stack } from './card-stacks';
 
 export default class Foundation extends React.Component {
   render() {
-    const { stacks, moveCard, ...other } = this.props;
+    const { stacks, ...other } = this.props;
 
     return (
-      <View direction='row' {...other}>
-        { stacks.map((stack, i) => <Stack key={i} cards={stack} moveCard={moveCard}/>) }
+      <View direction='row'>
+        { stacks.map((stack, i) => <Stack key={i} cards={stack} {...other}/>) }
       </View>
     );
   }
