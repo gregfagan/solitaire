@@ -1,4 +1,5 @@
 import React from 'react';
+import Card, { Slot } from './card'
 import { Stack } from './card-stacks';
 
 export default class Draw extends React.Component {
@@ -18,7 +19,12 @@ export default class Draw extends React.Component {
     const { cards } = this.props;
 
     return (
-      <Stack onClick={this.handleClick} faceUp={false} cards={cards} style={style} />
+      <Stack onClick={this.handleClick} style={style}>
+        <Slot/>
+        { cards.map((card, i) => 
+          <Card key={card} id={card} faceUp={false}/>
+        )}
+      </Stack>
     );
   }
 };

@@ -20,12 +20,12 @@ export default class Board extends React.Component {
         <View alignSelf='center' style={styles.board}>
           <View direction='row'>
             <Draw cards={draw} drawCard={actions.drawCard}/>
-            <Waste cards={waste} moveCard={actions.moveCard}/>
+            <Waste cards={waste} onMove={actions.movePath}/>
             <View grow={1}/>
-            <Foundation stacks={foundation} moveCard={actions.moveCard}/>
+            <Foundation stacks={foundation} onMove={actions.movePath}/>
           </View>
           <View style={{ height: '1em' }}/>
-          <Tableau columns={tableau} moveCard={actions.moveCard}/>
+          <Tableau columns={tableau} onMove={actions.movePath}/>
           <CardDragLayer/>
         </View>
       </View>

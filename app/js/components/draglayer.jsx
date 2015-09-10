@@ -1,5 +1,5 @@
 import React from 'react';
-import Card from 'components/card';
+import { Slot } from 'components/card';
 import { DragLayer } from 'react-dnd';
 import { getElementClientOffset } from 'react-dnd/modules/utils/OffsetHelpers';
 
@@ -34,7 +34,7 @@ export default class CardDragLayer extends React.Component {
       <div style={layerStyles}>
       { isDragging &&
         <div style={getItemStyles(this.props, this.state)}>
-          <Card id={item.id}/>
+          <Slot/>
         </div>
       }
       </div>

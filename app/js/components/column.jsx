@@ -1,17 +1,24 @@
 import React from 'react';
-import View from './view';
-import Card from './card';
+import Card, { Slot } from './card';
 import { Cascade } from './card-stacks';
+import { DropPath, DragAndDropPath } from './draggable-path';
 
 export default class Column extends React.Component {
   render() {
-    const { covered, uncovered, ...other } = this.props;
+    const { path, covered, uncovered, onMove, ...other } = this.props;
 
     return (
-      <Cascade {...other}>
-        { covered.map(id => <Card key={id} id={id} faceUp={false} />) }
-        { uncovered.map(id => <Card key={id} id={id} />) }
-      </Cascade>
+      <DropPath path={path.concat(['uncovered', Math.max(uncovered.length - 1, 0)])}>
+        <Cascade cascadeAtDepth={1} {...other}>
+          <Slot/>
+          { covered.map(id => <Card key={id} id={id} faceUp={false} />) }
+          { uncovered.map((id, i) => (
+            <DragAndDropPath key={id} path={path.concat(['uncovered', i])} onMove={onMove}>
+              <Card id={id}/>
+            </DragAndDropPath>
+          ))}
+        </Cascade>
+      </DropPath>
     );
   }
 };

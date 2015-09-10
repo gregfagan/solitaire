@@ -12,6 +12,7 @@ export default class Tableau extends React.Component {
         columns.map((column, i) =>
           <Column
             key={i}
+            path={['tableau', i]}
             {...column}
             {...other}
           />

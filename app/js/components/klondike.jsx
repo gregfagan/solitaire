@@ -21,7 +21,7 @@ const drawCountOptions = {
     },
     game: {
       drawCard: () => dispatch(actions.draw()),
-      moveCard: (from, to) => dispatch(actions.move(from, to)),
+      movePath: (from, to) => dispatch(actions.move(from, to)),
     },
   }
 }))
