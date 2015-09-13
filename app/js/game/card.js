@@ -45,49 +45,16 @@ export function rank(card) {
   return card.rank;
 }
 
-export function doesTableauStack(fromCard, toCard) {
-  if (!fromCard || !toCard) return false;
-
-  var fromRankIdx = ranks.indexOf(rank(fromCard));
-  var toRankIdx = ranks.indexOf(rank(toCard));
-  var isPreviousRank = (fromRankIdx + 1) === toRankIdx;
-  var isOppositeColor = isRed(fromCard) !== isRed(toCard);
-
-  return isPreviousRank && isOppositeColor;
-}
-
-export function doesFoundationStack(fromCard, toCard) {
-  if (!fromCard || !toCard) return false;
-
-  var fromRankIdx = ranks.indexOf(rank(fromCard));
-  var toRankIdx = ranks.indexOf(rank(toCard));
-  var isNextRank = (fromRankIdx - 1) === toRankIdx;
-  var isSameSuit = suit(fromCard) === suit(toCard);
-
-  return isNextRank && isSameSuit;
-}
-
+// Complete map of id => card
 export const deck = suits.map(
   suit => ranks.map(
-    rank => ({
-      suit, rank, id: toId({ rank, suit })
-    })
+    rank => ({ suit, rank, id: toId({ rank, suit }) })
   ))
   .reduce((deck, suitOfCards) => [...deck, ...suitOfCards]) // flatten
   .reduce((deck, card) => { //index
     const { id, ...suitAndRank } = card;
     deck[id] = suitAndRank;
     return deck;
-  }, {});
-
-export function createDeck() {
-  const deck = [];
-
-  suits.forEach(function (suit) {
-    ranks.forEach(function (rank) {
-      deck.push({rank: rank, suit: suit});
-    });
-  });
-
-  return deck;
-}
+  }, 
+  {}
+);
