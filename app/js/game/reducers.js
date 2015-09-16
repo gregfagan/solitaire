@@ -3,6 +3,7 @@ import { SET_DRAW_COUNT, SHUFFLE_AND_DEAL, DRAW, MOVE } from './actions';
 import { initialBoard, shuffleAndDeal } from './rules/begin';
 import { draw } from './rules/drawingCards';
 import { move } from './rules/movingCards';
+import { uncover } from './rules/uncoveringCards';
 
 const initialState = {
   options: {
@@ -21,7 +22,7 @@ export default function klondike(state=initialState, action) {
       return { ...state, board: draw(state.board, state.options.drawCount) };
     case MOVE:
       const { from, to } = action.payload;
-      return { ...state, board: move(state.board, from, to) };
+      return { ...state, board: uncover(move(state.board, from, to)) };
     default:
       return state;
   }

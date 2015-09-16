@@ -26,14 +26,18 @@ import { cardsAtPath } from '../inspect'
 
 export function move(board, fromPath, toPath) {
   if (canMove(board, fromPath, toPath)) {
-    const cards = cardsAtPath(board, fromPath);
-    const cut = set({}, initial(fromPath), {$splice: [[last(fromPath), cards.length]]});
-    const paste = set({}, initial(toPath), {$push: cards});
-    console.log(`moving ${fromPath} (${cards}) to ${toPath} (${get(board, toPath)})`);
-    return update(update(board, cut), paste);
+    // console.log(`moving ${fromPath} (${cards}) to ${toPath} (${get(board, toPath)})`);
+    return doMove(board, fromPath, toPath);
   }
 
   return board;
+}
+
+export function doMove(board, fromPath, toPath) {
+  const cards = cardsAtPath(board, fromPath);
+  const cut = set({}, initial(fromPath), {$splice: [[last(fromPath), cards.length]]});
+  const paste = set({}, initial(toPath), {$push: cards});
+  return update(update(board, cut), paste); 
 }
 
 function canMove(board, fromPath, toPath) {
