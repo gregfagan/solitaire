@@ -89,7 +89,7 @@ function destinationIsEmpty(board, toPath) {
     true;
   return (
     last(toPath) === 0 &&
-    pathIsTopOfStack(board, toPath) &&
+    get(board, initial(toPath)).length === 0 &&
     columnIsEmpty
   );
 }
