@@ -1,5 +1,7 @@
 import React from 'react';
-import { Slot } from 'components/card';
+import View from 'components/view';
+import Card from 'components/card';
+import { Cascade } from 'components/card-stacks';
 import { DragLayer } from 'react-dnd';
 import { getElementClientOffset } from 'react-dnd/modules/utils/OffsetHelpers';
 
@@ -28,13 +30,19 @@ export default class CardDragLayer extends React.Component {
   }
 
   render() {
-    const { item, isDragging } = this.props;
+    const { item, isDragging, cardsAtPath } = this.props;
 
     return (
       <div style={layerStyles}>
       { isDragging &&
         <div style={getItemStyles(this.props, this.state)}>
-          <Slot/>
+        <View>
+          <Cascade>
+            {cardsAtPath(item.path).map(card => (
+              <Card key={card} id={card}/>
+            ))}
+          </Cascade>
+        </View>
         </div>
       }
       </div>

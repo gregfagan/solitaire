@@ -13,7 +13,7 @@ import CardDragLayer from './draglayer';
 @DragDropContext(HTML5Backend)
 export default class Board extends React.Component {
   render() {
-    const { draw, waste, foundation, tableau, actions } = this.props;
+    const { draw, waste, foundation, tableau, actions, cardsAtPath } = this.props;
     
     return (
       <View style={{ perspective: 400 }}>
@@ -26,7 +26,7 @@ export default class Board extends React.Component {
           </View>
           <View style={{ height: '1em' }}/>
           <Tableau columns={tableau} onMove={actions.movePath}/>
-          <CardDragLayer/>
+          <CardDragLayer cardsAtPath={cardsAtPath}/>
         </View>
       </View>
     );

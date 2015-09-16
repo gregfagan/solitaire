@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import findKey from 'lodash/object/findKey';
 
 import actions from '../game/actions';
+import { cardsAtPath } from '../game/inspect';
 
 import View from './view';
 import Menu from './menu';
@@ -39,7 +40,7 @@ export default class Klondike extends Component {
           actions={actions.interface}
           drawOptions={Object.keys(drawCountOptions)}
           currentDrawCountOption={findKey(drawCountOptions, option => option === options.drawCount)} />
-        <Board {...board} actions={actions.game} />
+        <Board {...board} actions={actions.game} cardsAtPath={cardsAtPath.bind(null, board)}/>
       </View>
     );
   }
