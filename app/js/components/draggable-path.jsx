@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React, { PropTypes, cloneElement } from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd/modules/backends/HTML5';
 import View from './view';
@@ -34,18 +34,18 @@ export class DragPath extends React.Component {
   }
 
   render() {
-    const { path, isDragging, connectDragSource, connectDragPreview, style, ...other } = this.props;
-
-    const view = <View style={{ opacity: isDragging ? 0 : 1, ...style}} {...other}/>;
-    return connectDragSource(view);
+    const { path, isDragging, connectDragSource, connectDragPreview, style, children, ...other } = this.props;
+    const hideWhileDraggingStyle = { opacity: isDragging ? 0 : 1, ...style };
+    const childProps = { style: hideWhileDraggingStyle, ...other};
+    return connectDragSource(cloneElement(children, childProps));
   }
 }
 
 @DropTarget('Path', {
   drop: (props, monitor) => {
-    const { onMove } = props;
+    const { onMove, path:toPath } = props;
     const fromPath = monitor.getItem().path;
-    props.onMove(fromPath, props.path);
+    onMove(fromPath, toPath);
   }
 }, connect => ({
   connectDropTarget: connect.dropTarget(),
@@ -57,7 +57,8 @@ export class DropPath extends React.Component {
   }
 
   render() {
-    return this.props.connectDropTarget(this.props.children);
+    const { children, connectDropTarget, onMove, path, ...other } = this.props;
+    return connectDropTarget(cloneElement(children, other));
   }
 }
 
