@@ -23,7 +23,11 @@ export class DragPath extends React.Component {
 
   render() {
     const { path, isDragging, connectDragSource, style, children, ...other } = this.props;
-    const hideWhileDraggingStyle = { opacity: isDragging ? 0 : 1, ...style };
+    const hideWhileDraggingStyle = {
+      opacity: isDragging ? 0 : 1,
+      cursor: 'grab; cursor: -webkit-grab',
+      ...style
+    };
     const childProps = { style: hideWhileDraggingStyle, ...other};
     return connectDragSource(cloneElement(children, childProps));
   }

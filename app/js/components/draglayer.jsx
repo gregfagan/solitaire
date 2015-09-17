@@ -73,10 +73,10 @@ export default class CardDragLayer extends React.Component {
 const layerStyles = {
   transformStyle: 'preserve-3d',
   position: 'absolute',
-  pointerEvents: 'none',
   zIndex: 100,
   left: 0,
   top: 0,
+  cursor: 'grabbing; cursor: -webkit-grabbing',
 };
 
 function getItemStyles(props, state) {
