@@ -2,6 +2,12 @@ import React, { PropTypes } from 'react';
 import { firstAndRest } from 'util/react-children';
 
 export default class Stack extends React.Component {
+  static propTypes = {
+    container: PropTypes.oneOfType([PropTypes.string, PropTypes.func]).isRequired,
+    depth: PropTypes.number,
+    children: PropTypes.array.isRequired,
+  }
+
   render() {
     const { container:Container, depth=0, children, ...other } = this.props;
 

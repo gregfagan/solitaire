@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 
 var prefixableOptions = new Set(['start', 'end']);
 
@@ -29,13 +29,25 @@ export default class View extends React.Component {
   }
 }
 
-export class ViewStackedInZ extends React.Component {
+export class StackableView extends React.Component {
+  static propTypes = {
+    depth: PropTypes.number,
+    thickness: PropTypes.string, // number with css unit
+    cascadeBy: PropTypes.string, // number with css unit
+  }
+
+  static defaultProps = {
+    depth: 0,
+    thickness: '1px',
+    cascadeBy: '0%',
+  }
+
   render() {
-    const { depth=0, thickness='1px', cascadeBy='0%', cascadeAtDepth=0, style, ...other } = this.props;
+    const { depth, thickness, cascadeBy, style, ...other } = this.props;
     return (
       <View style={{
           position: depth === 0 ? 'relative' : 'absolute',
-          top: (depth > cascadeAtDepth) ? cascadeBy : 0,
+          top: cascadeBy,
           left: 0,
           zIndex: depth,
           transform: `translateZ(${thickness})`,
