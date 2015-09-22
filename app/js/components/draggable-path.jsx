@@ -42,11 +42,16 @@ export class DragPath extends React.Component {
 }
 
 @DropTarget('Path', {
+  canDrop: (props, monitor) => {
+    const { canMove, path:toPath } = props;
+    const fromPath = monitor.getItem().path;
+    return canMove && canMove(fromPath, toPath);
+  },
   drop: (props, monitor) => {
     const { onMove, path:toPath } = props;
     const fromPath = monitor.getItem().path;
     onMove(fromPath, toPath);
-  }
+  },
 }, connect => ({
   connectDropTarget: connect.dropTarget(),
 }))

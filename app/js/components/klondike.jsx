@@ -4,6 +4,7 @@ import findKey from 'lodash/object/findKey';
 
 import actions from '../game/actions';
 import { cardsAtPath } from '../game/inspect';
+import { canMove } from '../game/rules/movingCards';
 
 import View from './view';
 import Menu from './menu';
@@ -34,13 +35,18 @@ export default class Klondike extends Component {
   render() {
     const { board, options, actions } = this.props;
 
+    const inspect = {
+      cardsAtPath: cardsAtPath.bind(null, board),
+      canMove: canMove.bind(null, board),
+    };
+
     return (
       <View>
         <Menu
           actions={actions.interface}
           drawOptions={Object.keys(drawCountOptions)}
           currentDrawCountOption={findKey(drawCountOptions, option => option === options.drawCount)} />
-        <Board {...board} actions={actions.game} cardsAtPath={cardsAtPath.bind(null, board)}/>
+        <Board {...board} actions={actions.game} inspect={inspect}/>
       </View>
     );
   }

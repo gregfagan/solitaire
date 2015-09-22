@@ -41,9 +41,9 @@ export class MovableCascade extends React.Component {
 
 class DraggableStackableView extends React.Component {
   render() {
-    const { path, depth, onMove, ...other } = this.props;
+    const { path, depth, onMove, canMove, ...other } = this.props;
     return (
-      <DragAndDropPath path={path.concat(depth)} onMove={onMove}>
+      <DragAndDropPath path={path.concat(depth)} onMove={onMove} canMove={canMove}>
         <StackableView depth={depth} {...other}/>
       </DragAndDropPath>
     );

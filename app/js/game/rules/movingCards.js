@@ -40,7 +40,7 @@ export function doMove(board, fromPath, toPath) {
   return update(update(board, cut), paste); 
 }
 
-function canMove(board, fromPath, toPath) {
+export function canMove(board, fromPath, toPath) {
   if (!canMoveFromPath(board, fromPath)) return false;
 
   const fromCardId = get(board, fromPath);
