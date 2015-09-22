@@ -48,19 +48,21 @@ function canMove(board, fromPath, toPath) {
 
   return (
     pathIsTopOfStack(board, toPath) &&
-    ( // Foundation
-      // toPath: [foundation, columnIndex, index]
-      toPath[0] === 'foundation' &&
-      pathIsTopOfStack(board, fromPath) &&
-      (pathIsAce(board, fromPath) && destinationIsEmpty(board, toPath)) ||
-      canStackInFoundation(fromCardId, toCardId)
-    ) ||
-    ( // Tableau
-      // toPath: [tableau, columnIndex, uncovered, index]
-      toPath[0] === 'tableau' &&
-      toPath[2] === 'uncovered' &&
-      (pathIsKing(board, fromPath) && destinationIsEmpty(board, toPath)) ||
-      canStackInTableau(fromCardId, toCardId)
+    (
+      ( // Foundation
+        // toPath: [foundation, columnIndex, index]
+        toPath[0] === 'foundation' &&
+        pathIsTopOfStack(board, fromPath) &&
+        (pathIsAce(board, fromPath) && destinationIsEmpty(board, toPath)) ||
+        canStackInFoundation(fromCardId, toCardId)
+      ) ||
+      ( // Tableau
+        // toPath: [tableau, columnIndex, uncovered, index]
+        toPath[0] === 'tableau' &&
+        toPath[2] === 'uncovered' &&
+        (pathIsKing(board, fromPath) && destinationIsEmpty(board, toPath)) ||
+        canStackInTableau(fromCardId, toCardId)
+      )
     )
   );
 }
