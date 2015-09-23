@@ -5,20 +5,18 @@ export const SET_DRAW_COUNT = 'SET_DRAW_COUNT';
 export const MOVE = 'MOVE';
 
 // action creators
-function shuffleAndDeal() {
+export function shuffleAndDeal() {
   return { type: SHUFFLE_AND_DEAL };
 }
 
-function draw() {
+export function draw() {
   return { type: DRAW };
 }
 
-function setDrawCount(count) {
+export function setDrawCount(count) {
   return { type: SET_DRAW_COUNT, payload: count };
 }
 
-function move(from, to) {
+export function move(from, to) {
   return { type: MOVE, payload: { from, to } };
 }
-
-export default { shuffleAndDeal, draw, setDrawCount, move };
