@@ -7,7 +7,7 @@ import { uncover } from './rules/uncoveringCards';
 
 const initialState = {
   options: {
-    drawCount: 1,
+    drawCount: 3,
   },
   board: initialBoard,
 };
