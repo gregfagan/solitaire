@@ -7,7 +7,7 @@ import { DragAndDropPath } from './draggable-path';
 export class Stack extends React.Component {
   static defaultProps = {
     container: StackableView,  // for stack
-    thickness,                  // for stack container
+    thickness,                 // for stack container
   }
 
   render() {
@@ -19,7 +19,7 @@ export class Stack extends React.Component {
 
 export class Cascade extends React.Component {
   static defaultProps = {
-    cascadeBy: '15%',           // for stack container
+    cascadeBy: '15%',          // for stack container
   }
 
   render() {
