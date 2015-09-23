@@ -26,7 +26,6 @@ import { cardsAtPath } from '../inspect'
 
 export function move(board, fromPath, toPath) {
   if (canMove(board, fromPath, toPath)) {
-    // console.log(`moving ${fromPath} (${cards}) to ${toPath} (${get(board, toPath)})`);
     return doMove(board, fromPath, toPath);
   }
 
