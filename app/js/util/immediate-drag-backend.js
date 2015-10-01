@@ -24,9 +24,13 @@ class ImmediateDragBackend {
 
     this.getSourceClientOffset = this.getSourceClientOffset.bind(this);
     this.handleTopTouchStart = this.handleTopTouchStart.bind(this);
-    this.handleTopTouchStartCapture = this.handleTopTouchStartCapture.bind(this);
+    this.handleTopMouseStart = this.handleTopMouseStart.bind(this);
+    this.handleTopEventStart = this.handleTopEventStart.bind(this);
+    this.handleTopEventStartCapture = this.handleTopEventStartCapture.bind(this);
     this.handleTopTouchMoveCapture = this.handleTopTouchMoveCapture.bind(this);
-    this.handleTopTouchEndCapture = this.handleTopTouchEndCapture.bind(this);
+    this.handleTopMouseMoveCapture = this.handleTopMouseMoveCapture.bind(this);
+    this.handleTopEventMoveCapture = this.handleTopEventMoveCapture.bind(this);
+    this.handleTopEventEndCapture = this.handleTopEventEndCapture.bind(this);
   }
 
   setup () {
@@ -37,10 +41,15 @@ class ImmediateDragBackend {
     invariant(!this.constructor.isSetUp, 'Cannot have two ImmediateDragBackends at the same time.');
     this.constructor.isSetUp = true;
 
-    window.addEventListener('touchstart', this.handleTopTouchStartCapture, true);
+    window.addEventListener('touchstart', this.handleTopEventStartCapture, true);
     window.addEventListener('touchstart', this.handleTopTouchStart);
     window.addEventListener('touchmove', this.handleTopTouchMoveCapture, true);
-    window.addEventListener('touchend', this.handleTopTouchEndCapture, true);
+    window.addEventListener('touchend', this.handleTopEventEndCapture, true);
+
+    window.addEventListener('mousedown', this.handleTopEventStartCapture, true);
+    window.addEventListener('mousedown', this.handleTopMouseStart);
+    window.addEventListener('mousemove', this.handleTopMouseMoveCapture, true);
+    window.addEventListener('mouseup', this.handleTopEventEndCapture, true);
   }
 
   teardown () {
@@ -50,23 +59,30 @@ class ImmediateDragBackend {
 
     this.constructor.isSetUp = false;
 
-    window.removeEventListener('touchstart', this.handleTopTouchStartCapture, true);
-    window.removeEventListener('touchstart', this.handleTopTouchStart);
-    window.removeEventListener('touchmove', this.handleTopTouchMoveCapture, true);
-    window.removeEventListener('touchend', this.handleTopTouchEndCapture, true);
+    window.removeEventListener('touchstart', this.handleTopEventStartCapture, true);
+    window.removeEventListener('touchstart', this.handleTopEventStart);
+    window.removeEventListener('touchmove', this.handleTopEventMoveCapture, true);
+    window.removeEventListener('touchend', this.handleTopEventEndCapture, true);
+
+    window.removeEventListener('mousedown', this.handleTopEventStartCapture, true);
+    window.removeEventListener('mousedown', this.handleTopMouseStart);
+    window.removeEventListener('mousemove', this.handleTopMouseMoveCapture, true);
+    window.removeEventListener('mouseup', this.handleTopEventEndCapture, true);
 
     this.uninstallSourceNodeRemovalObserver();
   }
 
   connectDragSource (sourceId, node, options) {
-    const handleTouchStart = this.handleTouchStart.bind(this, sourceId);
+    const handleEventStart = this.handleEventStart.bind(this, sourceId);
     this.sourceNodes[sourceId] = node;
 
-    node.addEventListener('touchstart', handleTouchStart);
+    node.addEventListener('touchstart', handleEventStart);
+    node.addEventListener('mousedown', handleEventStart);
 
     return () => {
       delete this.sourceNodes[sourceId];
-      node.removeEventListener('touchstart', handleTouchStart);
+      node.removeEventListener('touchstart', handleEventStart);
+      node.removeEventListener('mousedown', handleEventStart);
     };
   }
 
@@ -92,35 +108,38 @@ class ImmediateDragBackend {
     return getElementClientOffset(this.sourceNodes[sourceId]);
   }
 
-  handleTopTouchStartCapture (e) {
-    this.touchStartSourceIds = [];
+  handleTopEventStartCapture (e) {
+    this.eventStartSourceIds = [];
   }
 
-  handleTouchStart (sourceId) {
-    this.touchStartSourceIds.unshift(sourceId);
+  handleEventStart (sourceId) {
+    this.eventStartSourceIds.unshift(sourceId);
   }
 
-  handleTopTouchStart (e) {
-    const { touchStartSourceIds } = this;
-
+  handleTopTouchStart(e) {
     if (e.targetTouches.length !== 1) {
-        return;
+      return;
     }
+
+    return this.handleTopEventStart(e, getEventClientOffset(e.targetTouches[0]));
+  }
+
+  handleTopMouseStart(e) {
+    return this.handleTopEventStart(e, getEventClientOffset(e));
+  }
+
+  handleTopEventStart(e, clientOffset) {
+    const { eventStartSourceIds } = this;
 
     // Don't prematurely preventDefault() here since it might:
     // 1. Mess up scrolling
     // 2. Mess up long tap (which brings up context menu)
     // 3. If there's an anchor link as a child, tap won't be triggered on link
 
-    const clientOffset = getEventClientOffset(e.targetTouches[0]);
+    if (!this.monitor.isDragging() && eventStartSourceIds) {
+      this.eventStartSourceIds = null;
 
-    if (
-      !this.monitor.isDragging() &&
-      touchStartSourceIds
-    ) {
-      this.touchStartSourceIds = null;
-
-      this.actions.beginDrag(touchStartSourceIds, {
+      this.actions.beginDrag(eventStartSourceIds, {
         clientOffset,
         getSourceClientOffset: this.getSourceClientOffset,
         publishSource: false
@@ -138,18 +157,22 @@ class ImmediateDragBackend {
     e.preventDefault();
   }
 
-  handleTopTouchMoveCapture (e) {
-    const { touchStartSourceIds } = this;
-
+  handleTopTouchMoveCapture(e) {
     if (e.targetTouches.length !== 1) {
         return;
     }
+      
+    return this.handleTopEventMoveCapture(e, getEventClientOffset(e.targetTouches[0]));
+  }
 
+  handleTopMouseMoveCapture(e) {
+    return this.handleTopEventMoveCapture(e, getEventClientOffset(e)); 
+  }
+
+  handleTopEventMoveCapture(e, clientOffset) {
     if (!this.monitor.isDragging()) {
       return;
     }
-
-    const clientOffset = getEventClientOffset(e.targetTouches[0]);
 
     e.preventDefault();
 
@@ -165,7 +188,7 @@ class ImmediateDragBackend {
     this.actions.hover(matchingTargetIds, { clientOffset });
   }
 
-  handleTopTouchEndCapture (e) {
+  handleTopEventEndCapture (e) {
     if (!this.monitor.isDragging() || this.monitor.didDrop()) {
       return;
     }
