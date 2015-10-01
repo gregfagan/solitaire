@@ -7,10 +7,10 @@ import Foundation from './foundation';
 import Tableau from './tableau';
 
 import { DragDropContext } from 'react-dnd';
-import HTML5Backend from 'react-dnd/modules/backends/HTML5';
+import ImmediateDragBackend from '../util/immediate-drag-backend';
 import CardDragLayer from './draglayer';
 
-@DragDropContext(HTML5Backend)
+@DragDropContext(ImmediateDragBackend)
 export default class Board extends React.Component {
   render() {
     const { draw, waste, foundation, tableau, actions, inspect } = this.props;
