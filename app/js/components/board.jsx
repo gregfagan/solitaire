@@ -16,7 +16,7 @@ export default class Board extends React.Component {
     const { draw, waste, foundation, tableau, actions, inspect } = this.props;
     
     return (
-      <View style={{ perspective: 400 }}>
+      <View style={styles.container}>
         <View alignSelf='center' style={styles.board}>
           <View direction='row'>
             <Draw cards={draw} drawCard={actions.drawCard}/>
@@ -34,9 +34,12 @@ export default class Board extends React.Component {
 };
 
 const styles = {
+  container: {
+    perspective: 400,
+  },
   board: {
     fontSize: 36,
     margin: '1em auto',
     transform: 'rotateX(5deg) translateZ(-1em)',
-  }
+  },
 }

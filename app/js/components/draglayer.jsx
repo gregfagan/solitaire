@@ -3,7 +3,7 @@ import View from 'components/view';
 import Card from 'components/card';
 import { Cascade } from 'components/card-stacks';
 import { DragLayer } from 'react-dnd';
-import { getElementClientOffset } from 'react-dnd/modules/utils/OffsetHelpers';
+import getElementClientOffset from '../util/offset';
 
 @DragLayer(monitor => ({
   item: monitor.getItem(),
@@ -14,7 +14,7 @@ import { getElementClientOffset } from 'react-dnd/modules/utils/OffsetHelpers';
 export default class CardDragLayer extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { layerOffset: { x: 0, y: 0} };
+    this.state = { layerOffset: { x: 0, y: 0 } };
   }
 
   static defaultProps = {
@@ -35,15 +35,13 @@ export default class CardDragLayer extends React.Component {
     return (
       <div style={layerStyles}>
       { isDragging &&
-        <div style={getItemStyles(this.props, this.state)}>
-        <View>
+        <View style={getItemStyles(this.props, this.state)}>
           <Cascade>
             {cardsAtPath(item.path).map(card => (
               <Card key={card} id={card}/>
             ))}
           </Cascade>
         </View>
-        </div>
       }
       </div>
     );
@@ -52,7 +50,7 @@ export default class CardDragLayer extends React.Component {
 
 const layerStyles = {
   transformStyle: 'preserve-3d',
-  position: 'fixed',
+  position: 'absolute',
   pointerEvents: 'none',
   zIndex: 100,
   left: 0,

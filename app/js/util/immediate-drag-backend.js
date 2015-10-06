@@ -6,11 +6,12 @@
 // https://github.com/gaearon/react-dnd/blob/ba8359ab3d7c76592357e078561d0e9d96afbcb0/src/backends/Touch.js
 //
 
-import { getElementClientOffset, getEventClientOffset } from 'react-dnd/modules/utils/OffsetHelpers';
+import { getEventClientOffset } from 'react-dnd/modules/utils/OffsetHelpers';
 import invariant from 'invariant';
+import getElementClientOffset from './offset';
 
 class ImmediateDragBackend {
-  constructor (manager) {
+  constructor(manager) {
     this.actions = manager.getActions();
     this.monitor = manager.getMonitor();
     this.registry = manager.getRegistry();
@@ -33,7 +34,7 @@ class ImmediateDragBackend {
     this.handleTopEventEndCapture = this.handleTopEventEndCapture.bind(this);
   }
 
-  setup () {
+  setup() {
     if (typeof window === 'undefined') {
         return;
     }
@@ -52,7 +53,7 @@ class ImmediateDragBackend {
     window.addEventListener('mouseup', this.handleTopEventEndCapture, true);
   }
 
-  teardown () {
+  teardown() {
     if (typeof window === 'undefined') {
         return;
     }
@@ -72,7 +73,7 @@ class ImmediateDragBackend {
     this.uninstallSourceNodeRemovalObserver();
   }
 
-  connectDragSource (sourceId, node, options) {
+  connectDragSource(sourceId, node, options) {
     const handleEventStart = this.handleEventStart.bind(this, sourceId);
     this.sourceNodes[sourceId] = node;
 
@@ -86,7 +87,7 @@ class ImmediateDragBackend {
     };
   }
 
-  connectDragPreview (sourceId, node, options) {
+  connectDragPreview(sourceId, node, options) {
     this.sourcePreviewNodeOptions[sourceId] = options;
     this.sourcePreviewNodes[sourceId] = node;
 
@@ -96,7 +97,7 @@ class ImmediateDragBackend {
     };
   }
 
-  connectDropTarget (targetId, node) {
+  connectDropTarget(targetId, node) {
     this.targetNodes[targetId] = node;
 
     return () => {
@@ -104,15 +105,15 @@ class ImmediateDragBackend {
     };
   }
 
-  getSourceClientOffset (sourceId) {
+  getSourceClientOffset(sourceId) {
     return getElementClientOffset(this.sourceNodes[sourceId]);
   }
 
-  handleTopEventStartCapture (e) {
+  handleTopEventStartCapture(e) {
     this.eventStartSourceIds = [];
   }
 
-  handleEventStart (sourceId) {
+  handleEventStart(sourceId) {
     this.eventStartSourceIds.unshift(sourceId);
   }
 
@@ -188,7 +189,7 @@ class ImmediateDragBackend {
     this.actions.hover(matchingTargetIds, { clientOffset });
   }
 
-  handleTopEventEndCapture (e) {
+  handleTopEventEndCapture(e) {
     if (!this.monitor.isDragging() || this.monitor.didDrop()) {
       return;
     }
@@ -201,7 +202,7 @@ class ImmediateDragBackend {
     this.actions.endDrag();
   }
 
-  installSourceNodeRemovalObserver (node) {
+  installSourceNodeRemovalObserver(node) {
     this.uninstallSourceNodeRemovalObserver();
 
     this.draggedSourceNode = node;
@@ -218,13 +219,13 @@ class ImmediateDragBackend {
     );
   }
 
-  resurrectSourceNode () {
+  resurrectSourceNode() {
     this.draggedSourceNode.style.display = 'none';
     this.draggedSourceNode.removeAttribute('data-reactid');
     document.body.appendChild(this.draggedSourceNode);
   }
 
-  uninstallSourceNodeRemovalObserver () {
+  uninstallSourceNodeRemovalObserver() {
     if (this.draggedSourceNodeRemovalObserver) {
       this.draggedSourceNodeRemovalObserver.disconnect();
     }
