@@ -6,6 +6,11 @@ import { DragLayer } from 'react-dnd';
 import getElementClientOffset from '../util/offset';
 import clamp from '../util/clamp';
 
+//
+// Because the cards are taller than they are wide, I allow them to tilt
+// more when moving left-right as opposed to up-down. This evens out the
+// visual effect.
+//
 const degreesTiltX = 45;
 const degreesTiltY = 35;
 const maxTiltVelocity = 2200; // points per second
