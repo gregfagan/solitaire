@@ -19,7 +19,7 @@ export default class Draw extends React.Component {
     const { cards } = this.props;
 
     return (
-      <Stack onClick={this.handleClick} style={style}>
+      <Stack onTouchTap={this.handleClick} style={style}>
         <Slot/>
         { cards.map((card, i) => 
           <Card key={card} id={card} faceUp={false}/>

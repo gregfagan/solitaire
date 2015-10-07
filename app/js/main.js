@@ -1,6 +1,7 @@
 import 'babel/polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import injectTapEvents from 'react-tap-event-plugin';
 import View from './components/view';
 import { Style } from 'radium';
 
@@ -26,4 +27,5 @@ const app = (
   </View>
 );
 
+injectTapEvents();
 ReactDOM.render(app, document.getElementById('app'));

@@ -8,7 +8,7 @@ export default class Menu extends Component {
     const { shuffleAndDeal, setDrawCount } = actions;
     return (
       <View style={styles.menu} direction='row'>
-        <Button onClick={shuffleAndDeal}>New Game</Button>
+        <Button onTouchTap={shuffleAndDeal}>New Game</Button>
         <Toggle value={currentDrawCountOption} onToggle={setDrawCount}>
           { drawOptions }
         </Toggle>
@@ -20,11 +20,11 @@ export default class Menu extends Component {
 class Toggle extends Component {
   constructor() {
     super();
-    this.handleClick = this.handleClick.bind(this);
+    this.handlePress = this.handlePress.bind(this);
   }
 
-  handleClick(option) {
-    return (e) => {
+  handlePress(option) {
+    return e => {
       e.preventDefault();
       e.stopPropagation();
 
@@ -38,7 +38,7 @@ class Toggle extends Component {
       <View direction='row' style={{...styles.button, padding: 0}}>
         {
           options.map(option => (
-            <Button key={option} active={value === option} onClick={this.handleClick(option)} style={styles.toggleButton}>{option}</Button>
+            <Button key={option} active={value === option} onTouchTap={this.handlePress(option)} style={styles.toggleButton}>{option}</Button>
           ))
         }
       </View>
@@ -67,6 +67,7 @@ const styles = {
     fontSize: 14,
   },
   button: {
+    cursor: 'pointer',
     fontWeight: 'bold',
     fontSize: 'inherit',
     margin: '0.25em',
