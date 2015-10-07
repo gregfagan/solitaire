@@ -1,6 +1,5 @@
 import React, { PropTypes, cloneElement } from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
-import { getEmptyImage } from 'react-dnd/modules/backends/HTML5';
 import View from './view';
 
 //
@@ -10,7 +9,6 @@ import View from './view';
 @DragSource('Path', {
   beginDrag: props => ({ path: props.path }),
 }, (connect, monitor) => ({
-  connectDragPreview: connect.dragPreview(),
   connectDragSource: connect.dragSource(),
   isDragging: monitor.isDragging(),
 }))
@@ -23,18 +21,8 @@ export class DragPath extends React.Component {
     path: [],
   }
 
-  componentDidMount() {
-    // Use empty image as a drag preview so browsers don't draw it
-    // and we can draw whatever we want on the custom drag layer instead.
-    this.props.connectDragPreview(getEmptyImage(), {
-      // IE fallback: specify that we'd rather screenshot the node
-      // when it already knows it's being dragged so we can hide it with CSS.
-      captureDraggingState: true
-    })
-  }
-
   render() {
-    const { path, isDragging, connectDragSource, connectDragPreview, style, children, ...other } = this.props;
+    const { path, isDragging, connectDragSource, style, children, ...other } = this.props;
     const hideWhileDraggingStyle = { opacity: isDragging ? 0 : 1, ...style };
     const childProps = { style: hideWhileDraggingStyle, ...other};
     return connectDragSource(cloneElement(children, childProps));
