@@ -4,6 +4,11 @@ import Card from 'components/card';
 import { Cascade } from 'components/card-stacks';
 import { DragLayer } from 'react-dnd';
 import getElementClientOffset from '../util/offset';
+import clamp from '../util/clamp';
+
+const degreesTiltX = 45;
+const degreesTiltY = 35;
+const maxTiltVelocity = 2200; // points per second
 
 @DragLayer(monitor => ({
   item: monitor.getItem(),
@@ -14,11 +19,14 @@ import getElementClientOffset from '../util/offset';
 export default class CardDragLayer extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { layerOffset: { x: 0, y: 0 } };
+    this.state = {
+      layerOffset: { x: 0, y: 0 },
+      velocity: { x: 0, y: 0 }
+    };
   }
 
   static defaultProps = {
-    dragHeight: 20,
+    dragHeight: 100,
   }
 
   componentWillReceiveProps(props) {
@@ -27,6 +35,21 @@ export default class CardDragLayer extends React.Component {
       const offset = getElementClientOffset(node);
       this.setState({ layerOffset: offset });
     } catch(e) {}
+
+    const lastUpdate = this.state.lastUpdate;
+    const now = performance.now();
+    this.setState({ lastUpdate: now });
+
+    const { currentOffset:previousOffset } = this.props;
+
+    if (props.currentOffset && previousOffset && lastUpdate) {
+      const dt = ((now - lastUpdate) / 1000);
+      const velocity = {
+        x: (props.currentOffset.x - previousOffset.x)/dt, // points per second
+        y: (props.currentOffset.y - previousOffset.y)/dt,
+      }
+      this.setState({ velocity });
+    }
   }
 
   render() {
@@ -55,26 +78,26 @@ const layerStyles = {
   zIndex: 100,
   left: 0,
   top: 0,
-  width: '100%',
-  height: '100%',
 };
 
 function getItemStyles(props, state) {
   const { initialOffset, currentOffset, isDragging, dragHeight } = props;
-  const { layerOffset } = state;
+  const { layerOffset, velocity } = state;
 
   if (!initialOffset || !currentOffset) {
     return {
       display: 'none'
     };
   }
-
+  
   const { x, y } = currentOffset;
   const { x:x0, y:y0 } = layerOffset;
 
-  const transform = `translate3d(${x - x0}px, ${y - y0}px, ${dragHeight}px)`;
-  return {
-    transform: transform,
-    WebkitTransform: transform,
-  };
+  // rx is rotation for motion in the x axis, which is rotated around the Y axis.
+  // ry is rotation for motion in the y axis, which is rotated around the X axis.
+  const rx = clamp((velocity.x / maxTiltVelocity) * degreesTiltX, -degreesTiltX, degreesTiltX);
+  const ry = clamp((-velocity.y / maxTiltVelocity) * degreesTiltY, -degreesTiltY, degreesTiltY);
+  
+  const transform = `translate3d(${x - x0}px, ${y - y0}px, ${dragHeight}px) rotateY(${rx}deg) rotateX(${ry}deg)`;
+  return { transform };
 };

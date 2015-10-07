@@ -10,9 +10,9 @@ function prefix(flexOption) {
 
 export default class View extends React.Component {
   render() {
-    let { tag:Tag='div', direction='column', grow=0, shrink=0, basis='auto', justifyContent='start', alignItems='stretch', alignContent='stretch', wrap=false, style, ...other } = this.props;
+    let { tag:Tag='div', direction='column', grow=0, shrink=0, basis='auto', justifyContent='start', alignItems='stretch', alignContent='stretch', alignSelf, wrap=false, style, ...other } = this.props;
     let flexStyle = {
-      display: 'flex;display:-webkit-flex',
+      display: 'flex',
       boxSizing: 'border-box',
       position: 'relative',
       transformStyle: 'preserve-3d',
@@ -23,6 +23,7 @@ export default class View extends React.Component {
       justifyContent: prefix(justifyContent),
       alignItems: prefix(alignItems),
       alignContent: prefix(alignContent),
+      alignSelf: prefix(alignSelf),
       flexWrap: wrap ? 'wrap' : 'nowrap'
     };
     return <Tag style={{...flexStyle, ...style}} {...other}/>

@@ -19,7 +19,7 @@ export class Stack extends React.Component {
 
 export class Cascade extends React.Component {
   static defaultProps = {
-    cascadeBy: '15%',          // for stack container
+    cascadeBy: '18%',          // for stack container
   }
 
   render() {

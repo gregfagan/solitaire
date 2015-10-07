@@ -35,7 +35,7 @@ export default class Board extends React.Component {
 
 const styles = {
   container: {
-    perspective: 400,
+    perspective: 1500,
   },
   board: {
     fontSize: 36,
