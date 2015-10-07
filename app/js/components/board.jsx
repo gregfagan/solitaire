@@ -40,6 +40,6 @@ const styles = {
   board: {
     fontSize: 36,
     margin: '1em auto',
-    transform: 'rotateX(5deg) translateZ(-1em)',
+    transform: 'rotateX(15deg) translateZ(-1em)',
   },
 }
