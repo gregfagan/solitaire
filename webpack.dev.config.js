@@ -2,7 +2,6 @@ import _ from 'lodash';
 import path from 'path';
 import webpack from 'webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
-import stylus_plugin from 'nib';
 import os from 'os';
 
 const netInterfaces = os.networkInterfaces();
@@ -35,7 +34,7 @@ const config = {
     loaders: [
       { test: /\.styl/, loader: 'style!css!stylus' },
       { test: /\.json$/, loader: 'json-loader' },
-      { test: /\.jsx?$/, exclude: /node_modules/, loaders: ['react-hot', 'babel?stage=0'] },
+      { test: /\.jsx?$/, exclude: /node_modules/, loader: 'babel?stage=0' },
       { test: /svgCards\/.+\.svg/, loaders: ['url-loader?limit=16384', 'svgo-loader?useConfig=svgo', '../../../card-image-loader'] },
       { test: /\.(png|jpg)$/, loader: 'url-loader?limit=8192' }
     ]
@@ -53,9 +52,6 @@ const config = {
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin()
   ],
-  stylus: {
-    use: [stylus_plugin()]
-  },
   svgo: {
     // this plugin is not compatible with the source images
     plugins: [ { convertTransform: false } ]

@@ -1,5 +1,6 @@
 import 'babel/polyfill';
 import React from 'react';
+import ReactDOM from 'react-dom';
 import View from './components/view';
 import { Style } from 'radium';
 
@@ -20,10 +21,9 @@ const app = (
   <View>
     <Style rules={styles}/>
     <Provider store={store}>
-      { () => <Klondike /> }
+      <Klondike />
     </Provider>
   </View>
 );
 
-React.initializeTouchEvents(true);
-React.render(app, document.getElementById('app'));
+ReactDOM.render(app, document.getElementById('app'));

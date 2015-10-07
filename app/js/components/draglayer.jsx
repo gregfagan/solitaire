@@ -1,4 +1,5 @@
 import React from 'react';
+import { findDOMNode } from 'react-dom';
 import View from 'components/view';
 import Card from 'components/card';
 import { Cascade } from 'components/card-stacks';
@@ -35,11 +36,9 @@ export default class CardDragLayer extends React.Component {
   }
 
   componentWillReceiveProps(props) {
-    try {
-      const node = React.findDOMNode(this);
-      const offset = getElementClientOffset(node);
-      this.setState({ layerOffset: offset });
-    } catch(e) {}
+    const node = findDOMNode(this);
+    const offset = getElementClientOffset(node);
+    this.setState({ layerOffset: offset });
 
     const lastUpdate = this.state.lastUpdate;
     const now = performance.now();
