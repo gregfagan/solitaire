@@ -1,6 +1,8 @@
 import React from 'react';
+import View from './view';
 import Card, { Slot } from './card'
 import { Stack } from './card-stacks';
+import recycle from '../../img/recycle.svg';
 
 export default class Draw extends React.Component {
   constructor() {
@@ -19,8 +21,12 @@ export default class Draw extends React.Component {
     const { cards } = this.props;
 
     return (
-      <Stack onTouchTap={this.handleClick} style={style}>
-        <Slot/>
+      <Stack onTouchTap={this.handleClick} style={styles.stack}>
+        <Slot>
+          <View grow={1} alignItems='center' justifyContent='center'>
+            <img style={styles.image} src={recycle}/>
+          </View>
+        </Slot>
         { cards.map((card, i) => 
           <Card key={card} id={card} faceUp={false}/>
         )}
@@ -29,6 +35,12 @@ export default class Draw extends React.Component {
   }
 };
 
-const style = {
-  cursor: 'pointer',
+const styles = {
+  stack: {
+    cursor: 'pointer',
+  },
+  image: {
+    width: '1.5em',
+    height: '1.5em',
+  },
 };

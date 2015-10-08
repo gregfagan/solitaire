@@ -36,6 +36,7 @@ const config = {
       { test: /\.json$/, loader: 'json-loader' },
       { test: /\.jsx?$/, exclude: /node_modules/, loader: 'babel?stage=0' },
       { test: /svgCards\/.+\.svg/, loaders: ['url-loader?limit=16384', 'svgo-loader?useConfig=svgo', '../../../card-image-loader'] },
+      { test: /^(?!.+svgCards).+\.svg/, loaders: ['url-loader?limit=16384', 'svgo-loader?useConfig=svgo'] },
       { test: /\.(png|jpg)$/, loader: 'url-loader?limit=8192' }
     ]
   },

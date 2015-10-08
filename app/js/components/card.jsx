@@ -29,16 +29,17 @@ export default class Card extends React.Component {
 
 export class Slot extends React.Component {
   render() {
+    const { style, ...other } = this.props;
     return (
       <View style={styles.card}>
-        <View style={styles.slot}/>
+        <View style={{...styles.slot, ...style}} {...other}/>
       </View>
     );
   }
 };
 
 const side = {
-  display: 'block',
+  display: 'flex',
   position:'absolute',
   width: '100%',
   height: '100%',
@@ -63,6 +64,7 @@ const styles = {
   },
   slot: {
     ...side,
-    border: '0.1em dashed #999'
+    border: '0.080em dashed white',
+    opacity: 0.3,
   }
 }
