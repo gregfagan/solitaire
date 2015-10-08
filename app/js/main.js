@@ -14,7 +14,9 @@ const store = createStore(klondike);
 
 const styles = {
   'body': {
-    backgroundColor: '#0F2A42'
+    '-webkit-user-select': 'none',
+    '-ms-user-select': 'none',
+    backgroundColor: '#0F2A42',
   }
 }
 
