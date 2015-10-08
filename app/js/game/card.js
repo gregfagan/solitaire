@@ -9,14 +9,6 @@ export const images = _(suits)
   .transform((result, card) => result[card.id] = require(`../../img/svgCards/${card.image_id}.svg`), {})
   .value();
 
-// This value was calculated by taking the measurements found here:
-//      http://www.gripboard.com/index.php?showtopic=41080
-// and the current pixel count of a card width (2.5em/inches/90 pixels)
-// to find a ratio between inches and pixels.
-// TODO: This should be calculated at runtime so that it can change with
-// card size (which should scale with viewport)
-export const thickness = '0.430615385px';
-
 export function isCard(card) {
   return card.suit && card.rank;
 }

@@ -1,13 +1,11 @@
 import React, { PropTypes } from 'react';
 import { StackableView } from './view';
 import { default as BaseStack } from './stack';
-import { thickness } from '../game/card';
 import { DragAndDropPath } from './draggable-path';
 
 export class Stack extends React.Component {
   static defaultProps = {
     container: StackableView,  // for stack
-    thickness,                 // for stack container
   }
 
   render() {
