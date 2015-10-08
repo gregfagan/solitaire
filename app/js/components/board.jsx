@@ -13,14 +13,14 @@ import CardDragLayer from './draglayer';
 @DragDropContext(ImmediateDragBackend)
 export default class Board extends React.Component {
   render() {
-    const { draw, waste, foundation, tableau, actions, inspect } = this.props;
+    const { draw, waste, foundation, tableau, actions, inspect, visibleWasteCount } = this.props;
     
     return (
       <View style={styles.container}>
         <View alignSelf='center' style={styles.board}>
           <View direction='row'>
             <Draw cards={draw} drawCard={actions.drawCard}/>
-            <Waste cards={waste} onMove={actions.movePath}/>
+            <Waste cards={waste} onMove={actions.movePath} visibleCount={visibleWasteCount}/>
             <View grow={1}/>
             <Foundation stacks={foundation} onMove={actions.movePath} canMove={inspect.canMove}/>
           </View>

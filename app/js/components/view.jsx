@@ -30,26 +30,34 @@ export default class View extends React.Component {
   }
 }
 
+const cascadeDirectionToStyle = {
+  down: 'top',
+  right: 'left',
+}
+
 export class StackableView extends React.Component {
   static propTypes = {
     depth: PropTypes.number,
     thickness: PropTypes.string, // number with css unit
     cascadeBy: PropTypes.string, // number with css unit
+    cascadeDirection: PropTypes.oneOf(['down', 'right']),
   }
 
   static defaultProps = {
     depth: 0,
     thickness: '1px',
     cascadeBy: '0%',
+    cascadeDirection: 'down',
   }
 
   render() {
-    const { depth, thickness, cascadeBy, style, ...other } = this.props;
+    const { depth, thickness, cascadeBy, cascadeDirection, style, ...other } = this.props;
     return (
       <View style={{
           position: depth === 0 ? 'relative' : 'absolute',
-          top: cascadeBy,
+          top: 0,
           left: 0,
+          [cascadeDirectionToStyle[cascadeDirection]]: depth > 0 ? cascadeBy : 0,
           zIndex: depth,
           transform: `translateZ(${thickness})`,
           ...style,

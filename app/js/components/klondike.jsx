@@ -55,7 +55,11 @@ export default class Klondike extends Component {
           actions={actions.interface}
           drawOptions={Object.keys(drawCountOptions)}
           currentDrawCountOption={findKey(drawCountOptions, option => option === options.drawCount)} />
-        <Board {...board} actions={actions.game} inspect={inspect}/>
+        <Board
+          {...board}
+          actions={actions.game}
+          inspect={inspect}
+          visibleWasteCount={options.drawCount} />
       </View>
     );
   }
