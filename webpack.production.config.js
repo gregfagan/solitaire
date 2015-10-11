@@ -1,10 +1,15 @@
 import webpack from 'webpack';
 import baseConfig from './webpack.base.config.js';
 
-const { plugins: basePlugins, ...otherBaseConfig } = baseConfig;
+const { output:baseOutput, plugins: basePlugins, ...otherBaseConfig } = baseConfig;
+const { publicPath, ...otherOutput } = baseOutput;
 
 const config = {
   ...otherBaseConfig,
+  output: {
+    ...otherOutput,
+    publicPath: '/solitaire/',
+  },
   plugins: [
     ...basePlugins,
     new webpack.optimize.UglifyJsPlugin({

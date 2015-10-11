@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "scripts": {
     "start": "babel-node server.js",
-    "build": "rm -rf build && PRODUCTION=1 webpack -p"
+    "build": "rm -rf build && PRODUCTION=1 webpack -p",
+    "publish": "./publish.sh"
   },
   "private": true,
   "devDependencies": {
