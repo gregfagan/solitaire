@@ -1,2 +1,6 @@
 require('babel/register');
-module.exports = require('./webpack.dev.config.js');
+module.exports = require(
+  process.env.PRODUCTION ?
+    './webpack.production.config.js' :
+    './webpack.dev.config.js'
+);

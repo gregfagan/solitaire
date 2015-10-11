@@ -2,7 +2,8 @@
   "name": "react-solitaire",
   "version": "0.0.1",
   "scripts": {
-    "start": "babel-node --stage 1 server.js"
+    "start": "babel-node server.js",
+    "build": "rm -rf build && PRODUCTION=1 webpack -p"
   },
   "private": true,
   "devDependencies": {
